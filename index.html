@@ -165,7 +165,7 @@ td .t{font-weight:600}
 /* brand profile cards */
 .bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
 .bcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
-.bc-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.bc-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:14px;align-items:center}
 .bc-t h3{margin:0;font-size:19px;line-height:1.3}
 .bc-t h3 .blink{font-weight:700;font-size:19px}
 .bc-m{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:3px}
@@ -201,7 +201,7 @@ td .t{font-weight:600}
 .bprof{display:flex;flex-direction:column;gap:14px}
 .nlink{font-weight:500;font-size:13px;color:var(--ink);text-decoration:none}
 .nlink:hover{color:var(--lilac-ink);text-decoration:underline}
-@media (max-width:560px){.bc-h{grid-template-columns:auto minmax(0,1fr)}.bc-h .vd{grid-column:1/-1;justify-self:start}}
+@media (max-width:560px){.bc-h{grid-template-columns:auto minmax(0,1fr) auto}.bc-h .vd{grid-column:1/-1;grid-row:2;justify-self:start}.rep-head .hero-thumb{--hs:84px!important}}
 /* แถบบนของหน้า: โลโก้ (มือถือ) + ปุ่มบัญชีมุมขวา */
 .pbar{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:-12px 0 8px}
 .pbar .mlogo{display:none;margin-right:auto}
@@ -229,8 +229,26 @@ td .t{font-weight:600}
 .cand .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:auto;border-top:1px solid var(--line);padding-top:10px}
 .keybox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .keybox code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all;flex:1 1 220px}
-details.cands-wrap>summary{cursor:pointer;list-style:none}
-details.cands-wrap>summary::-webkit-details-marker{display:none}
+/* แท็บหน้าแบรนด์ */
+.tabs{display:flex;gap:4px;box-shadow:inset 0 -1px 0 var(--line);margin:0 0 16px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:10px 16px;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.tab .num{font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:99px;padding:0 8px;font-weight:500}
+.tab:hover{color:var(--ink)}
+.tab.on{color:var(--lilac-ink);border-bottom-color:var(--lilac-btn)}
+.tab.on .num{background:var(--lilac-soft);border-color:var(--lilac-line);color:var(--lilac-ink)}
+/* รูปสินค้าฮีโร่ */
+.cand-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.hero-thumb{flex:none;width:var(--hs);height:var(--hs);border-radius:12px;border:1px solid var(--line);background:#fff;padding:3px;cursor:zoom-in;overflow:hidden;box-shadow:0 6px 16px -10px rgba(31,35,64,.4)}
+.hero-thumb img{width:100%;height:100%;object-fit:contain;display:block;border-radius:9px}
+.hero-thumb:hover{border-color:var(--lilac)}
+.lightbox{position:fixed;inset:0;z-index:70;background:rgba(18,20,38,.92);display:grid;place-items:center;padding:56px 16px 24px}
+.lightbox figure{margin:0;max-width:min(96vw,1100px);max-height:100%;display:flex;flex-direction:column;align-items:center;gap:12px}
+.lightbox img{max-width:100%;max-height:calc(100vh - 160px);object-fit:contain;background:#fff;border-radius:14px}
+.lightbox figcaption{color:#fff;font-size:14px;text-align:center;display:flex;flex-direction:column;gap:4px}
+.lightbox figcaption a{color:#E7D3EC}
+.lb-close{position:fixed;top:12px;right:14px;width:44px;height:44px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:28px;line-height:1;cursor:pointer}
+.lb-close:hover{background:rgba(255,255,255,.28)}
 @media (max-width:760px){.pbar{margin:0 0 12px}.pbar .mlogo{display:flex;font-size:17px}.tabbar{grid-template-columns:repeat(4,1fr)}}
 @media (prefers-reduced-motion:no-preference){.chip,.btn,.nav{transition:background .15s,border-color .15s,color .15s}}
 </style>
@@ -370,6 +388,7 @@ async function boot() {
     S.data = await call('getBoot', S.token);
     S.user = S.data.user;
     S.page = load('br_page') || 'radar';
+    S.btab = load('br_btab') || 'trend';
     if ((S.page === 'users' && S.user.role !== 'admin') || S.page === 'account') S.page = 'radar';
     renderShell();
   } catch (e) { if (S.token) renderLogin(e.message); }
@@ -478,7 +497,7 @@ function pRadar() {
     <div><div class="k">หลักฐานในมุมมองนี้<\/div><div class="v">${fmtN(ev.length)}<small>รายการ<\/small><\/div><\/div>
     <div><div class="k">ระดับความน่าเชื่อถือ<\/div><div class="v" style="font-size:16px;padding-top:6px"><span class="lv A">A ${cnt.A}<\/span> <span class="lv B">B ${cnt.B}<\/span> <span class="lv C">C ${cnt.C}<\/span><\/div>
       <div class="lvbar"><i style="width:${cnt.A / total * 100}%;background:#7FC7A0"><\/i><i style="width:${cnt.B / total * 100}%;background:#F0C27E"><\/i><i style="width:${cnt.C / total * 100}%;background:#EBA1A1"><\/i><\/div><\/div>
-    <div><div class="k">แบรนด์ใน Watchlist<\/div><div class="v">${fmtN(d.brands.length)}<small>แบรนด์<\/small><\/div><\/div>
+    <div><div class="k">แบรนด์ใน Wishlist<\/div><div class="v">${fmtN(d.brands.length)}<small>แบรนด์<\/small><\/div><\/div>
     <div><div class="k">บัญชี IG ที่ติดตาม<\/div><div class="v">${fmtN(d.sources.filter(s => s.platform === 'Instagram' && s.active).length)}<small>บัญชี<\/small><\/div><\/div>
   <\/div>
   <div class="grid g-main">
@@ -492,7 +511,7 @@ function pRadar() {
       <section class="card"><div class="card-h"><h2>แบรนด์น่าสนใจนำเข้า<\/h2><button class="btn ghost sm" data-go="brands">ดูทุกแบรนด์<\/button><\/div>
         ${picks.length ? `<div class="rows">${picks.map(b => { const p = profOf(b); return `<div class="row"><button class="blink" data-report="${esc(b.id)}" style="min-width:0">${logo(b, 40)}<span style="min-width:0"><b>${esc(b.name)}<\/b> ${cc(b.market)}<span class="s" style="display:block">Hero: ${esc(p.hero.name)}<\/span><\/span><\/button>${verdictPill(b)}<\/div>`; }).join('')}<\/div>`
           : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์ ${S.user.role === 'admin' ? 'ไปที่หน้า "แบรนด์" แล้วกด "นำเข้าข้อมูลแบรนด์"' : ''}<\/div>`}<\/section>
-      <section class="card"><div class="card-h"><h2>แบรนด์ใหม่น่าจับตา<\/h2><button class="btn ghost sm" data-go="brands">ดูทั้งหมด<\/button><\/div>
+      <section class="card"><div class="card-h"><h2>แบรนด์ใหม่น่าจับตา<\/h2><button class="btn ghost sm" data-go="brands" data-settab="trend">ดูทั้งหมด<\/button><\/div>
         ${(() => { const l = candList().slice(0, 5); return l.length ? `<div class="rows">${l.map(c => `<div class="row"><div style="min-width:0"><b>${esc(c.name)}<\/b> ${cc(c.market)}
           <div class="s">${c.mentions30 ? c.mentions30 + ' ข่าวใน 30 วัน · ' : ''}${c.source.indexOf('claude') >= 0 ? 'Claude ค้นคว้า' : 'ระบบหาเอง'}<\/div><\/div>${candFda(c)}<\/div>`).join('')}<\/div>`
           : '<div class="empty">ยังไม่มีแบรนด์รอคัด ระบบหาให้วันละครั้งจากข่าวเทรนด์<\/div>'; })()}<\/section>
@@ -654,17 +673,31 @@ function pBrands() {
       && (!q || (b.name + ' ' + JSON.stringify(profOf(b) || '')).toLowerCase().includes(q)))
     .sort((a, b) => (VERDICT_ORDER[vOf(a)] ?? 9) - (VERDICT_ORDER[vOf(b)] ?? 9) || a.name.localeCompare(b.name));
   const nProf = d.brands.filter(b => profOf(b)).length;
-  return `
-  <div class="top"><div><h1>แบรนด์<\/h1><p class="sub">โลโก้ ประเทศต้นทาง Product Hero จุดเด่น สินค้าน่าสนใจ และคำแนะนำ · ทุกข้อกดตัวเลขเพื่อดูแหล่งที่มา<\/p><\/div>
-    <div class="chips">${isAdmin ? `<button class="btn ghost" id="importPack">${nProf ? 'อัปเดตข้อมูลแบรนด์ชุดล่าสุด' : 'นำเข้าข้อมูลแบรนด์ 15 แบรนด์'}<\/button>` : ''}<button class="btn" data-newbrand>+ เพิ่มแบรนด์<\/button><\/div><\/div>
+  const tab = S.btab === 'wish' ? 'wish' : 'trend';
+  const cands = candList().filter(c => (!f.market || c.market === f.market) && (!q || (c.name + ' ' + c.reason).toLowerCase().includes(q)));
+  const tabs = `<div class="tabs" role="tablist">
+      <button role="tab" class="tab${tab === 'trend' ? ' on' : ''}" data-btab="trend" aria-selected="${tab === 'trend'}">Brand Trend ที่น่าสนใจ <span class="num">${(d.candidates || []).length}<\/span><\/button>
+      <button role="tab" class="tab${tab === 'wish' ? ' on' : ''}" data-btab="wish" aria-selected="${tab === 'wish'}">Brand Wishlist <span class="num">${d.brands.length}<\/span><\/button><\/div>`;
+  const head = `
+  <div class="top"><div><h1>แบรนด์<\/h1><p class="sub">${tab === 'trend' ? 'แบรนด์ที่ระบบหาเจอจากข่าวเทรนด์ทุกวัน และ Claude ค้นคว้าทุกสัปดาห์ · เช็ค อย. ไทยให้อัตโนมัติ · กดเพิ่มเข้า Wishlist เมื่อสนใจ' : 'แบรนด์ที่ทีมเลือกติดตาม · Product Hero จุดเด่น สินค้าน่าสนใจ และคำแนะนำ · ทุกข้อกดตัวเลขเพื่อดูแหล่งที่มา'}<\/p><\/div>
+    <div class="chips">${tab === 'wish' && isAdmin ? `<button class="btn ghost" id="importPack">${nProf ? 'อัปเดตข้อมูลแบรนด์ชุดล่าสุด' : 'นำเข้าข้อมูลแบรนด์ 15 แบรนด์'}<\/button>` : ''}${tab === 'wish' ? '<button class="btn" data-newbrand>+ เพิ่มแบรนด์<\/button>' : ''}<\/div><\/div>
+  ${tabs}`;
+  if (tab === 'trend') return head + `
+  <div class="toolbar">
+    <input type="search" id="bq" placeholder="ค้นหาแบรนด์ หรือเหตุผลที่น่าสนใจ" value="${esc(f.q)}">
+    ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
+  <\/div>
+  <p class="sub" style="margin:-4px 0 12px">${cands.length} แบรนด์รอคัด · เรียง: ยังไม่มีใน อย. → มีจำนวนน้อย → อื่นๆ<\/p>
+  ${cands.length ? `<div class="cgrid">${cands.map(candCard).join('')}<\/div>`
+    : '<div class="empty">ยังไม่มีแบรนด์รอคัดตามตัวกรองนี้ ระบบจะเพิ่มให้เองเมื่อพบแบรนด์ที่ถูกพูดถึงในข่าวเทรนด์อย่างน้อย 2 ข่าวใน 30 วัน หรือเมื่อ Claude ส่งผลค้นคว้ารายสัปดาห์<\/div>'}`;
+  return head + `
   <div class="toolbar">
     <input type="search" id="bq" placeholder="ค้นหาแบรนด์ สินค้า ส่วนผสม" value="${esc(f.q)}">
     ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', few: 'มีในไทยแล้ว (จำนวนน้อย)', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
   <\/div>
-  ${candSection()}
-  <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์ใน Watchlist<\/p>
+  <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์ใน Wishlist<\/p>
   ${list.length ? `<div class="bgrid">${list.map(brandCard).join('')}<\/div>`
     : d.brands.length ? `<div class="empty">ไม่พบแบรนด์ตามตัวกรองนี้<\/div>`
     : `<div class="empty"><b>ยังไม่มีแบรนด์<\/b> ${isAdmin ? 'กด "นำเข้าข้อมูลแบรนด์ 15 แบรนด์" เพื่อโหลดข้อมูลที่ค้นคว้าไว้ หรือ' : ''} กด "+ เพิ่มแบรนด์"<\/div>`}`;
@@ -686,27 +719,43 @@ function candCard(c) {
   const src = c.source.indexOf('claude') >= 0 ? (c.source.indexOf('auto') >= 0 ? 'ระบบ + Claude' : 'Claude ค้นคว้า') : 'ระบบหาเอง';
   const trend = c.mentions30 ? `ถูกพูดถึง <b class="num">${c.mentions30}<\/b> ข่าวใน 30 วัน${c.mentionsPrev ? ` (ก่อนหน้า ${c.mentionsPrev})` : ''}` : '';
   return `<article class="cand">
-    <h3>${esc(c.name)} ${cc(c.market)}<\/h3>
+    <div class="cand-h"><h3>${esc(c.name)} ${cc(c.market)}<\/h3>${heroThumb(c.name, 64)}<\/div>
     <div class="meta"><span class="tag">${src}<\/span>${candFda(c)}${trend ? `<span>${trend}<\/span>` : ''}<\/div>
     ${c.reason ? `<p class="why">${esc(c.reason)}<\/p>` : ''}
     ${c.sources.length ? `<ul>${c.sources.slice(0, 4).map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a> ${lv(s[2])}<\/li>`).join('')}<\/ul>` : ''}
     ${c.links.length ? `<ul>${c.links.slice(0, 3).map(l => `<li><a href="${safeUrl(l[1])}" target="_blank" rel="noopener">${esc(l[0])}<\/a> <span class="sub" style="font-size:11px">${esc(l[2] || '')} · ${fmtDate(l[3])}<\/span><\/li>`).join('')}<\/ul>` : ''}
-    <div class="acts"><button class="btn ghost sm" data-candno="${esc(c.name)}">ไม่สนใจ<\/button><button class="btn sm" data-candadd="${esc(c.name)}">+ เพิ่มเข้า Watchlist<\/button><\/div>
+    <div class="acts"><button class="btn ghost sm" data-candno="${esc(c.name)}">ไม่สนใจ<\/button><button class="btn sm" data-candadd="${esc(c.name)}">+ เพิ่มเข้า Wishlist<\/button><\/div>
   <\/article>`;
 }
-function candSection() {
-  const list = candList();
-  const open = load('br_cands_open') !== '0';
-  return `<details class="card cands-wrap" style="margin-bottom:16px"${open ? ' open' : ''}><summary><div class="card-h" style="margin-bottom:0"><h2>แบรนด์น่าจับตา · รอคัด (${list.length})<\/h2>
-      <span class="hint">ระบบหาจากข่าวเทรนด์ทุกวัน + Claude ค้นคว้าทุกสัปดาห์ · เช็ค อย. ให้อัตโนมัติ<\/span><\/div><\/summary>
-    <div style="margin-top:12px">${list.length ? `<div class="cgrid">${list.map(candCard).join('')}<\/div>`
-      : '<div class="empty">ยังไม่มีแบรนด์รอคัด ระบบจะเพิ่มให้เองเมื่อพบแบรนด์ที่ถูกพูดถึงในข่าวเทรนด์อย่างน้อย 2 ข่าวใน 30 วัน หรือเมื่อ Claude ส่งผลค้นคว้ารายสัปดาห์<\/div>'}<\/div><\/details>`;
+// ---------- รูปสินค้าฮีโร่ ----------
+function heroOf(name) { return (S.data.heroes || {})[String(name || '').toLowerCase()] || null; }
+function heroThumb(name, size) {
+  const h = heroOf(name);
+  if (!h) return '';
+  return `<button class="hero-thumb" style="--hs:${size}px" data-hero="${esc(name)}" title="ดูรูปสินค้า: ${esc(h.title)}" aria-label="ดูรูปสินค้าฮีโร่ ${esc(name)} แบบเต็มจอ">
+    <img src="${safeUrl(/cdn\.shopify\.com/.test(h.image) ? h.image + (h.image.indexOf('?') < 0 ? '?' : '&') + 'width=360' : h.image)}" alt="${esc(h.title)}" loading="lazy" onerror="this.closest('.hero-thumb').remove()"><\/button>`;
+}
+function heroLightbox(name) {
+  const h = heroOf(name); if (!h) return;
+  const lb = document.createElement('div');
+  lb.className = 'lightbox'; lb.setAttribute('role', 'dialog'); lb.setAttribute('aria-modal', 'true');
+  lb.innerHTML = `<button class="lb-close" aria-label="ปิด">×<\/button>
+    <figure><img src="${safeUrl(h.image)}" alt="${esc(h.title)}">
+      <figcaption><div><b>${esc(name)}<\/b> · ${esc(h.title)}<\/div>
+        <span>ที่มา: <a href="${safeUrl(h.page)}" target="_blank" rel="noopener">หน้าสินค้าบนเว็บไซต์ทางการ ↗<\/a><\/span><\/figcaption><\/figure>`;
+  const close = () => { lb.remove(); document.removeEventListener('keydown', esc2); };
+  const esc2 = e => { if (e.key === 'Escape') close(); };
+  lb.onclick = e => { if (e.target === lb || e.target.classList.contains('lb-close')) close(); };
+  document.addEventListener('keydown', esc2);
+  document.body.appendChild(lb);
+  lb.querySelector('.lb-close').focus();
 }
 function bindCands() {
-  document.querySelectorAll('details.cands-wrap').forEach(d => d.ontoggle = () => store('br_cands_open', d.open ? '1' : '0'));
+  document.querySelectorAll('[data-btab]').forEach(b => b.onclick = () => { S.btab = b.dataset.btab; store('br_btab', S.btab); renderPage(); });
+  document.querySelectorAll('[data-hero]').forEach(b => b.onclick = e => { e.stopPropagation(); heroLightbox(b.dataset.hero); });
   document.querySelectorAll('[data-candadd]').forEach(b => b.onclick = async () => {
     busy(b, true);
-    try { await call('addCandidate', S.token, b.dataset.candadd); toast('เพิ่ม ' + b.dataset.candadd + ' เข้า Watchlist แล้ว'); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
+    try { await call('addCandidate', S.token, b.dataset.candadd); toast('เพิ่ม ' + b.dataset.candadd + ' เข้า Wishlist แล้ว'); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
   });
   document.querySelectorAll('[data-candno]').forEach(b => b.onclick = async () => {
     if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'กดอีกครั้งเพื่อยืนยัน'; return; }
@@ -726,6 +775,7 @@ function brandForm(b) {
     <label class="f">ผู้นำเข้าในไทย<select id="b_imp">${opt(LBL.importer, b.thaiImporter)}<\/select><\/label>
     <label class="f">เว็บไซต์แบรนด์<input type="url" id="b_web" value="${esc(b.website)}" placeholder="https://"><\/label>
     <label class="f">ลิงก์รูปโลโก้ (ไม่บังคับ)<input type="url" id="b_logo" value="${esc(b.logoUrl)}" placeholder="ว่างไว้ = ใช้ไอคอนจากเว็บไซต์"><\/label>
+    <label class="f full">ลิงก์หน้าสินค้าฮีโร่บนเว็บไซต์ทางการ (ไม่บังคับ)<input type="url" id="b_hero" value="${esc(b.heroPage)}" placeholder="https:// หน้าสินค้า — ระบบดึงรูปจากหน้านี้ให้เอง"><\/label>
     <label class="f full">บริษัทแม่
       <span style="display:flex;gap:8px"><select id="b_co" style="flex:1;min-width:0"><option value="">ยังไม่ระบุ<\/option>${S.data.companies.map(c => `<option value="${esc(c.id)}"${c.id === b.companyId ? ' selected' : ''}>${esc(c.name)}<\/option>`).join('')}<\/select>
       <button type="button" class="btn ghost sm" id="b_newco">+ บริษัทใหม่<\/button><\/span><\/label>
@@ -735,7 +785,7 @@ function brandForm(b) {
   <div class="modal-actions">${b.id && isAdmin ? '<button class="btn danger" id="bdel" style="margin-right:auto">ลบแบรนด์<\/button>' : ''}<button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="bsave">บันทึก<\/button><\/div>`);
   const v = id => document.getElementById(id).value;
   const draft = () => ({ id: b.id || '', name: v('b_name'), market: v('b_market'), category: v('b_category'), status: v('b_status'), thaiImporter: v('b_imp'), note: v('b_note'),
-    website: v('b_web'), logoUrl: v('b_logo'), companyId: v('b_co') });
+    website: v('b_web'), logoUrl: v('b_logo'), companyId: v('b_co'), heroPage: v('b_hero') });
   document.getElementById('b_newco').onclick = () => { const d = draft(); companyForm(null, async id => { d.companyId = id; brandForm(d); }, () => brandForm(d)); };
   document.getElementById('bsave').onclick = async ev => {
     busy(ev.target, true);
@@ -807,7 +857,7 @@ function brandCard(b) {
     <header class="bc-h"><button class="blink" data-report="${esc(b.id)}" aria-label="เปิดรายงาน ${esc(b.name)}">${logo(b, 56)}<\/button>
       <div class="bc-t"><h3><button class="blink" data-report="${esc(b.id)}">${esc(b.name)}<\/button><\/h3>
         <div class="bc-m">${cc(b.market)}<span>${esc(LBL.category[b.category] || '')}<\/span>${c ? `<span>· ${esc(c.name)}<\/span>` : ''}<\/div><\/div>
-      ${verdictPill(b)}<\/header>
+      ${verdictPill(b)}${heroThumb(b.name, 64)}<\/header>
     ${p ? profileBody(b, p, false) : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์นี้ ${b.note ? '· ' + esc(b.note) : ''}<\/div>${fdaLine(b)}`}
     <footer class="bc-f"><span class="pill st-${esc(b.status)}">${esc(LBL.status[b.status])}<\/span>
       <span class="chips"><button class="btn sm" data-report="${esc(b.id)}">รายงานเต็ม<\/button><button class="btn ghost sm" data-editbrand="${esc(b.id)}">แก้ไข<\/button><\/span><\/footer>
@@ -856,12 +906,12 @@ function ring(score, coverage) {
 }
 function pReport() {
   const b = S.data.brands.find(x => x.id === S.brandId);
-  if (!b) return `<div class="empty">ไม่พบแบรนด์นี้ <button class="btn ghost sm" data-go="brands">กลับไป Watchlist<\/button><\/div>`;
+  if (!b) return `<div class="empty">ไม่พบแบรนด์นี้ <button class="btn ghost sm" data-go="brands">กลับไป Wishlist<\/button><\/div>`;
   const P = partnerScore(b), c = P.c;
   const metricsOrder = ['revenueGrowth', 'opMargin', 'founded', 'revenue', 'other'];
   const facts = P.facts.slice().sort((x, y) => metricsOrder.indexOf(x.metric) - metricsOrder.indexOf(y.metric) || y.addedAt - x.addedAt);
   return `
-  <button class="btn ghost sm" data-go="brands" style="margin-bottom:14px">← Watchlist<\/button>
+  <button class="btn ghost sm" data-go="brands" style="margin-bottom:14px">← Wishlist<\/button>
   <section class="rep-head">
     ${logo(b, 72)}
     <div style="min-width:0;flex:1">
@@ -872,6 +922,7 @@ function pReport() {
         ${c ? `<span>บริษัทแม่: <b>${esc(c.name)}<\/b>${c.listing ? ` <span class="tag">${esc(c.listing)}<\/span>` : ''}${c.website ? ` · <a href="${safeUrl(c.website)}" target="_blank" rel="noopener">เว็บไซต์บริษัทแม่ ↗<\/a>` : ''}<\/span>` : '<span class="sub">ยังไม่ระบุบริษัทแม่<\/span>'}
       <\/div>
     <\/div>
+    ${heroThumb(b.name, 110)}
     <div class="chips">${verdictPill(b)}<button class="btn ghost sm" id="fdaNow">ตรวจ อย. ตอนนี้<\/button><button class="btn ghost sm" data-editbrand="${esc(b.id)}">แก้ไขแบรนด์<\/button>${c ? `<button class="btn ghost sm" data-editco="${esc(c.id)}">แก้ไขบริษัทแม่<\/button>` : ''}<\/div>
   <\/section>
 
@@ -1069,7 +1120,7 @@ function resetPwForm(username) {
 // ---------- events ----------
 function bindPage() {
   const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
-  $$('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  $$('[data-go]').forEach(b => b.onclick = () => { if (b.dataset.settab) { S.btab = b.dataset.settab; store('br_btab', S.btab); } go(b.dataset.go); });
   $$('[data-fk]').forEach(b => b.onclick = () => { S.f[b.dataset.fk] = b.dataset.fv; renderPage(); });
   $$('[data-addbrand]').forEach(b => b.onclick = () => {
     const name = b.dataset.addbrand, e = S.data.evidence.find(x => x.brand.toLowerCase() === name.toLowerCase());
@@ -1085,7 +1136,7 @@ function bindPage() {
   $$('[data-editbrand]').forEach(b => b.onclick = () => brandForm(S.data.brands.find(x => x.id === b.dataset.editbrand)));
   bindCands();
   if (S.page === 'brands') {
-    $('[data-newbrand]').onclick = () => brandForm();
+    const nb = $('[data-newbrand]'); if (nb) nb.onclick = () => brandForm();
     $$('[data-bk]').forEach(b => b.onclick = () => { S.bf[b.dataset.bk] = b.dataset.fv; renderPage(); });
     $('#bq').oninput = () => { const pos = $('#bq').selectionStart; S.bf.q = $('#bq').value; renderPage(); const q = $('#bq'); q.focus(); try { q.setSelectionRange(pos, pos); } catch (e) {} };
     const ip = $('#importPack');
