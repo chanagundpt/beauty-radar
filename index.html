@@ -537,8 +537,10 @@ function pRadar() {
     <div class="grid" style="align-content:start">
       <section class="card"><div class="card-h"><h2>สัญญาณล่าสุด<\/h2><button class="btn ghost sm" data-go="evidence">ดูทั้งหมด<\/button><\/div>
         ${ev.length ? `<div>${sortSignals(ev).slice(0, 8).map(sigHtml).join('')}<\/div>` : `<div class="empty">ยังไม่มีหลักฐานในตลาด/หมวดนี้ <b>เพิ่มได้ที่หน้า "หลักฐาน"<\/b><\/div>`}<\/section>
-      <section class="card"><div class="card-h"><h2>ความสนใจคำค้นในเกาหลี (Naver)<\/h2><span class="hint">ดัชนีรายสัปดาห์ 52 สัปดาห์ · สูงสุดของแต่ละคำ = 100 · <a href="https://datalab.naver.com/" target="_blank" rel="noopener">Naver DataLab<\/a><\/span><\/div>
-        ${trendBlock(d.trends, d.connectors.naver)}<\/section>
+      ${d.connectors.naver && d.trends.length ? `<section class="card"><div class="card-h"><h2>ความสนใจคำค้นในเกาหลี (Naver)<\/h2><span class="hint">ดัชนีรายสัปดาห์ 52 สัปดาห์ · สูงสุดของแต่ละคำ = 100 · <a href="https://datalab.naver.com/" target="_blank" rel="noopener">Naver DataLab<\/a><\/span><\/div>
+        ${trendBlock(d.trends, d.connectors.naver)}<\/section>`
+      : `<section class="card"><div class="card-h"><h2>กระแสคำสำคัญในข่าวเทรนด์<\/h2><span class="hint">จำนวนหัวข่าวที่มีคำนี้ รายสัปดาห์ 12 สัปดาห์ · ทุกตลาด · Google News<\/span><\/div>
+        ${newsKeywordBlock(d)}<\/section>`}
     <\/div>
     <div class="grid" style="align-content:start">
       <section class="card"><div class="card-h"><h2>แบรนด์น่าสนใจนำเข้า<\/h2><button class="btn ghost sm" data-go="brands">ดูทุกแบรนด์<\/button><\/div>
@@ -602,9 +604,9 @@ function ytThaiBlock(d) {
     <div class="s">${g.n} คลิป · <span class="num">${fmtN(g.views)}<\/span> วิว · คลิปยอดนิยม: <a href="${safeUrl(g.top.url)}" target="_blank" rel="noopener">${esc(g.top.channel)}<\/a><\/div><\/div><\/div>`; }).join('')}<\/div>
     <p class="sub" style="font-size:12px;margin-top:8px">นับเฉพาะคลิปที่มีชื่อแบรนด์ในชื่อคลิป ค้นด้วยคำว่า "รีวิว" ในภูมิภาคไทย<\/p>`;
 }
-function spark(points) {
+function spark(points, maxOverride) {
   const v = points.map(p => p[1]); if (!v.length) return '';
-  const W = 160, H = 46, max = Math.max(100, ...v);
+  const W = 160, H = 46, max = maxOverride || Math.max(100, ...v);
   const x = i => 2 + i * (W - 4) / Math.max(v.length - 1, 1), y = n => H - 3 - (n / max) * (H - 8);
   const line = v.map((n, i) => `${x(i).toFixed(1)},${y(n).toFixed(1)}`).join(' ');
   return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><line x1="0" x2="${W}" y1="${y(50)}" y2="${y(50)}" stroke="#EEEAF2" stroke-width="1"/>
@@ -616,6 +618,30 @@ function change(points) {
   const avg = a => a.reduce((s, n) => s + n, 0) / a.length;
   const now = avg(v.slice(-4)), prev = avg(v.slice(-8, -4));
   return prev ? (now - prev) / prev * 100 : null;
+}
+// แทน Naver: นับจำนวนหัวข่าวเทรนด์ที่มีคำสำคัญ (ชื่อที่แสดง + คำพ้องในหน้าแหล่งข้อมูล) ต่อสัปดาห์ — เป็นการนับจริง ไม่ใช่การประมาณ
+function newsKeywordBlock(d) {
+  const W = 12, now = Date.now(), wk = 7 * 864e5;
+  const news = d.news.filter(n => n.subject.indexOf('TREND|') === 0 && n.publishedAt >= now - W * wk);
+  if (!news.length) return '<div class="empty">ยังไม่มีข่าวเทรนด์ ระบบดึงให้อัตโนมัติทุก 6 ชั่วโมง<\/div>';
+  const rows = d.keywords.filter(k => k.active).map(k => {
+    const terms = [k.label].concat(k.keyword.split(',')).map(s => s.trim().toLowerCase()).filter(s => s.length > 1);
+    const pts = Array.from({ length: W }, (_, i) => [String(i), 0]), hits = [];
+    news.forEach(n => {
+      const t = (n.title + ' ' + (n.titleTh || '')).toLowerCase();
+      if (!terms.some(x => t.indexOf(x) >= 0)) return;
+      const i = W - 1 - Math.floor((now - n.publishedAt) / wk); if (i >= 0 && i < W) pts[i][1]++;
+      hits.push(n);
+    });
+    const last4 = pts.slice(-4).reduce((s, p) => s + p[1], 0), prev4 = pts.slice(-8, -4).reduce((s, p) => s + p[1], 0);
+    return { k, pts, last4, prev4, top: hits.sort((a, b) => b.publishedAt - a.publishedAt)[0] };
+  }).filter(r => r.last4 + r.prev4 > 0).sort((a, b) => b.last4 - a.last4 || b.prev4 - a.prev4);
+  if (!rows.length) return '<div class="empty">ยังไม่พบคำสำคัญในหัวข่าวช่วง 12 สัปดาห์ แอดมินเพิ่มคำได้ที่หน้าแหล่งข้อมูล (คำค้น)<\/div>';
+  const max = Math.max(1, ...rows.map(r => Math.max(...r.pts.map(p => p[1]))));
+  return `<div class="kwgrid">${rows.map(r => { const c = r.prev4 ? (r.last4 - r.prev4) / r.prev4 * 100 : null; return `<div class="kw"><div class="n"><span>${esc(r.k.label)}<\/span>
+      <span class="num ${c == null ? 'flat' : c > 5 ? 'up' : c < -5 ? 'down' : 'flat'}">${c == null ? 'ใหม่' : (c > 0 ? '+' : '') + c.toFixed(0) + '%'}<\/span><\/div>${spark(r.pts, max)}
+      <div class="sub" style="font-size:11px">${r.last4} ข่าวใน 4 สัปดาห์${r.top ? ` · <a href="${safeUrl(r.top.link)}" target="_blank" rel="noopener">ข่าวล่าสุด<\/a>` : ''}<\/div><\/div>`; }).join('')}<\/div>
+    <p class="sub" style="font-size:12px;margin-top:8px">% = 4 สัปดาห์ล่าสุดเทียบ 4 สัปดาห์ก่อนหน้า · นับจากหัวข่าวที่ระบบดึงมา (ไม่ใช่ยอดค้นหา) · เชื่อม Naver ได้ภายหลังเพื่อดูยอดค้นหาในเกาหลี<\/p>`;
 }
 function trendBlock(trends, on) {
   if (!trends.length) return `<div class="empty">${on ? 'ตั้งค่า Naver แล้ว แต่ยังไม่มีข้อมูล ให้ผู้ดูแลกด <b>"ดึงข้อมูลตอนนี้"<\/b> ที่หน้าแหล่งข้อมูล' : '<b>ยังไม่ได้เชื่อม Naver DataLab<\/b> สมัคร NAVER API HUB (เลือก Search Trend) ที่ Naver Cloud Platform แล้วใส่ NAVER_CLIENT_ID / NAVER_CLIENT_SECRET ใน Script properties ตามขั้นตอนใน README'}<\/div>`;
