@@ -259,6 +259,8 @@ td .t{font-weight:600}
 .cand .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:auto;border-top:1px solid var(--line);padding-top:10px}
 .keybox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .keybox code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all;flex:1 1 220px}
+.ytl{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+.yt-ic{flex:none;width:20px;height:14px;border-radius:4px;background:#E2504C;color:#fff;font-size:8px;display:grid;place-items:center;margin-top:3px}
 /* แท็บหน้าแบรนด์ */
 .tabs{display:flex;gap:4px;box-shadow:inset 0 -1px 0 var(--line);margin:0 0 16px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -294,7 +296,7 @@ function showFatal(msg) {
   if (a) a.innerHTML = '<div class="loading" style="color:#A23838;max-width:640px;margin:0 auto;padding:60px 16px">' + String(msg).replace(/[<]/g, '&lt;') + '<\/div>';
 }
 function lineNo(e) { var m = String((e && e.stack) || '').match(/:(\d+):\d+\)?\s*$/m); return m ? Number(m[1]) : 0; }
-var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 291, __MAIN_LBL_LINE = 316;
+var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 293, __MAIN_LBL_LINE = 318;
 window.onerror = function (m, s, l, c) {
   var info = '';
   try {
@@ -783,10 +785,20 @@ function candCard(c) {
     ${c.reason ? `<p class="why">${esc(c.reason)}<\/p>` : ''}
     ${c.sources.length ? `<ul>${c.sources.slice(0, 4).map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a> ${lv(s[2])}<\/li>`).join('')}<\/ul>` : ''}
     ${c.links.length ? `<ul>${c.links.slice(0, 3).map(l => `<li><a href="${safeUrl(l[1])}" target="_blank" rel="noopener">${esc(l[0])}<\/a> <span class="sub" style="font-size:11px">${esc(l[2] || '')} · ${fmtDate(l[3])}<\/span><\/li>`).join('')}<\/ul>` : ''}
+    ${ytLine(c.name)}
     <div class="acts"><button class="btn ghost sm" data-candno="${esc(c.name)}">ไม่สนใจ<\/button><button class="btn sm" data-candadd="${esc(c.name)}">+ เพิ่มเข้า Wishlist<\/button><\/div>
   <\/article>`;
 }
 // ---------- รูปสินค้าฮีโร่ ----------
+// สรุปคลิปรีวิว YouTube 90 วันของแบรนด์ (ใช้ในการ์ด)
+function ytLine(name) {
+  if (!S.data.connectors.youtube) return '';
+  const v = (S.data.videos || []).filter(x => x.subject.toLowerCase() === String(name).toLowerCase());
+  if (!v.length) return `<div class="ytl"><span class="yt-ic">▶<\/span><span class="sub">YouTube: ยังไม่พบคลิปรีวิวที่มีชื่อแบรนด์ใน 90 วัน<\/span><\/div>`;
+  const th = v.filter(x => x.market === 'TH'), top = v.slice().sort((a, b) => b.views - a.views)[0];
+  return `<div class="ytl"><span class="yt-ic">▶<\/span><span>YouTube 90 วัน: ไทย <b class="num">${th.length}<\/b> คลิป (<span class="num">${fmtN(th.reduce((s, x) => s + x.views, 0))}<\/span> วิว) · ต่างประเทศ <b class="num">${v.length - th.length}<\/b> คลิป
+    · <a href="${safeUrl(top.url)}" target="_blank" rel="noopener">คลิปยอดนิยม<\/a><\/span><\/div>`;
+}
 function heroOf(name) { return (S.data.heroes || {})[String(name || '').toLowerCase()] || null; }
 function heroThumb(name, size) {
   const h = heroOf(name);
@@ -919,6 +931,7 @@ function brandCard(b) {
       ${heroThumb(b.name, 64)}<\/header>
     ${verdictPill(b) ? `<div class="bc-v">${verdictPill(b)}<\/div>` : ''}
     ${p ? profileBody(b, p, false) : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์นี้ ${b.note ? '· ' + esc(b.note) : ''}<\/div>${fdaLine(b)}`}
+    ${ytLine(b.name)}
     <footer class="bc-f"><span class="pill st-${esc(b.status)}">${esc(LBL.status[b.status])}<\/span>
       <span class="chips"><button class="btn sm" data-report="${esc(b.id)}">รายงานเต็ม<\/button><button class="btn ghost sm" data-editbrand="${esc(b.id)}">แก้ไข<\/button><\/span><\/footer>
   <\/article>`;
