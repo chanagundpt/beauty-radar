@@ -1091,7 +1091,7 @@ function pSources() {
   const conn = (on, name) => `<span class="pill ${on ? 'st-contacted' : 'st-watch'}">${name}: ${on ? 'เชื่อมแล้ว' : 'ยังไม่เชื่อม'}<\/span>`;
   return `
   <div class="top"><div><h1>แหล่งข้อมูล<\/h1><p class="sub">บัญชีและเว็บไซต์ที่ใช้ติดตามเทรนด์ และสถานะการดึงข้อมูลอัตโนมัติ<\/p><\/div>
-    ${isAdmin ? '<div class="chips"><button class="btn ghost" data-newsrc>+ เพิ่มแหล่งข้อมูล<\/button><button class="btn" id="fetchNow">ดึงข้อมูลตอนนี้<\/button><\/div>' : ''}<\/div>
+    ${isAdmin ? '<div class="chips"><button class="btn ghost" data-newsrc>+ เพิ่มแหล่งข้อมูล<\/button><button class="btn ghost" id="ytNow">ดึง YouTube ตอนนี้<\/button><button class="btn" id="fetchNow">ดึงข้อมูลตอนนี้<\/button><\/div>' : ''}<\/div>
   <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>การเชื่อมต่อ<\/h2><div class="chips"><span class="pill st-contacted">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชม.<\/span><span class="pill st-contacted">Google News: เชื่อมแล้ว<\/span><span class="pill st-contacted">แปลหัวข่าวเป็นไทย: เปิดอยู่<\/span><span class="pill st-contacted">Wikidata (ปีก่อตั้ง): เชื่อมแล้ว<\/span>${conn(d.connectors.youtube, 'YouTube')} ${conn(d.connectors.naver, 'Naver DataLab')} ${conn(d.connectors.instagram, 'Instagram Graph API')}<\/div><\/div>
     ${d.connectors.logs.length ? `<div class="rows">${d.connectors.logs.slice(0, 6).map(l => `<div class="row"><div><b style="font-size:13px">${esc(l.job)}<\/b> <span class="s">${fmtDate(l.time)} ${new Date(l.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}<\/span><div class="s" style="word-break:break-word">${esc(l.message)}<\/div><\/div><span class="lv ${l.ok ? 'A' : 'C'}">${l.ok ? 'สำเร็จ' : 'ผิดพลาด'}<\/span><\/div>`).join('')}<\/div>` : '<div class="empty">ยังไม่เคยดึงข้อมูล<\/div>'}<\/div>
   ${isAdmin && d.researchKey ? `<div class="card" style="margin-bottom:16px"><div class="card-h"><h2>รหัสสำหรับงานค้นคว้ารายสัปดาห์ของ Claude<\/h2><span class="hint">ใช้ส่งผลค้นคว้าแบรนด์ใหม่และแหล่งข้อมูลใหม่เข้ามาในระบบ · อย่าแชร์ให้คนอื่น<\/span><\/div>
@@ -1230,6 +1230,12 @@ function bindPage() {
       const kw = S.data.keywords.find(x => x.keyword === b.dataset.togglekw); busy(b, true);
       try { await call('saveKeyword', S.token, { keyword: kw.keyword, label: kw.label, active: !kw.active }); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
     });
+    const yt = $('#ytNow');
+    if (yt) yt.onclick = async () => {
+      busy(yt, true); yt.textContent = 'กำลังค้น YouTube… (1–2 นาที)';
+      try { const m = await call('runYouTubeNow', S.token); openModal(`<h2>ผลการดึง YouTube<\/h2><p>${esc(m || 'ไม่มีผล')}<\/p><div class="modal-actions"><button class="btn" data-close>ปิด<\/button><\/div>`); await refresh(); }
+      catch (e) { openModal(`<h2>ดึง YouTube ไม่สำเร็จ<\/h2><p>${esc(e.message)}<\/p><p class="sub">ตรวจว่าเพิ่มบริการ YouTube Data API v3 (Identifier: YouTube) ใน Apps Script แล้ว Deploy → New version แล้ว<\/p><div class="modal-actions"><button class="btn" data-close>ปิด<\/button><\/div>`); busy(yt, false); yt.textContent = 'ดึง YouTube ตอนนี้'; }
+    };
     const f = $('#fetchNow');
     if (f) f.onclick = async () => { busy(f, true); f.textContent = 'กำลังดึงข้อมูล…'; try { await call('runFetchNow', S.token); toast('ดึงข้อมูลเสร็จแล้ว'); await refresh(); } catch (e) { toast(e.message); busy(f, false); f.textContent = 'ดึงข้อมูลตอนนี้'; } };
   }
