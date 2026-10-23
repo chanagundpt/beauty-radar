@@ -1172,12 +1172,14 @@ function partnerScore(b) {
   const verdict = coverage < 60 ? ['ข้อมูลยังไม่พอสรุป', 'st-watch'] : score >= 75 ? ['น่าร่วมงาน', 'st-contacted'] : score >= 50 ? ['ควรศึกษาเพิ่มก่อนตัดสินใจ', 'st-shortlist'] : ['ความเสี่ยงสูง', 'st-rejected'];
   return { c, facts, ev, news, flagged, rows, coverage, score, verdict, lowLevel };
 }
+// ข้อมูลไม่ถึง 60%: ไม่แสดงคะแนน (กันเข้าใจผิดว่าได้ 100 จากเกณฑ์เดียว) วงแหวนแสดงความครบของข้อมูลแทน
 function ring(score, coverage) {
-  const r = 46, C = 2 * Math.PI * r, p = score == null ? 0 : score / 100;
-  return `<svg viewBox="0 0 120 120" class="ring" aria-label="คะแนน ${score == null ? 'ไม่มี' : score}"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#EFE8F2" stroke-width="10"/>
-    <circle cx="60" cy="60" r="${r}" fill="none" stroke="${coverage < 60 ? '#C9BCCD' : '#A47DAB'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C * p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)"/>
-    <text x="60" y="62" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="28" font-weight="500" fill="#1F2340">${score == null ? '–' : score}<\/text>
-    <text x="60" y="82" text-anchor="middle" font-size="11" fill="#6B6F86">จาก 100<\/text><\/svg>`;
+  const enough = coverage >= 60 && score != null;
+  const r = 46, C = 2 * Math.PI * r, p = enough ? score / 100 : coverage / 100;
+  return `<svg viewBox="0 0 120 120" class="ring" aria-label="${enough ? 'คะแนน ' + score : 'ยังไม่มีคะแนน ข้อมูลครบ ' + coverage + '%'}"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#EFE8F2" stroke-width="10"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="${enough ? '#A47DAB' : '#D9C9DD'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C * p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)"/>
+    <text x="60" y="62" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="28" font-weight="500" fill="${enough ? '#1F2340' : '#9A93A8'}">${enough ? score : '–'}<\/text>
+    <text x="60" y="82" text-anchor="middle" font-size="11" fill="#6B6F86">${enough ? 'จาก 100' : 'ข้อมูล ' + coverage + '%'}<\/text><\/svg>`;
 }
 function pReport() {
   const b = S.data.brands.find(x => x.id === S.brandId);
@@ -1208,7 +1210,8 @@ function pReport() {
       <div class="card-h"><h2>คะแนนความน่าเชื่อถือคู่ค้า<\/h2><span class="hint">คำนวณจากข้อมูลที่มีแหล่งอ้างอิงในระบบเท่านั้น<\/span><\/div>
       <div class="score">
         <div style="text-align:center">${ring(P.score, P.coverage)}<div><span class="pill ${P.verdict[1]}">${P.verdict[0]}<\/span><\/div>
-          <div class="sub" style="font-size:12px;margin-top:6px">ความครบของข้อมูล <b class="num">${P.coverage}%<\/b><\/div><\/div>
+          <div class="sub" style="font-size:12px;margin-top:6px">ความครบของข้อมูล <b class="num">${P.coverage}%<\/b><\/div>
+          ${P.coverage < 60 ? `<div class="sub" style="font-size:11.5px;margin-top:6px;text-align:left">ต้องมีข้อมูลอย่างน้อย 60% ถึงจะให้คะแนน · ยังขาด: ${esc(P.rows.filter(x => !x.i).map(x => x.r.label).join(', '))}<\/div>` : ''}<\/div>
         <div class="crit">${P.rows.map(({ r, i, g }) => `<div class="cr"><div class="cr-h"><span>${esc(r.label)} <span class="sub" style="font-size:11px">น้ำหนัก ${r.w}<\/span><\/span>
             ${i ? `<span class="num">${g}<\/span>` : '<span class="tag">ไม่มีข้อมูล<\/span>'}<\/div>
           <div class="bar"><i style="width:${i ? g : 0}%"><\/i><\/div>
