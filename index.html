@@ -285,6 +285,12 @@ td .t{font-weight:600}
 .ask textarea{min-height:64px}
 .ask-acts{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
 .sugg .chip{text-align:left;white-space:normal}
+.qa-list{display:flex;flex-direction:column;gap:12px}
+.qa{border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:8px}
+.qa-q{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.qa-q b{flex-basis:100%;font-size:15px}
+.qa .msg.assistant{max-width:100%}
+.qa .by{font-size:11px;color:var(--muted);margin-top:6px}
 .steps{margin:0;padding-left:20px;font-size:14px}.steps li{margin-bottom:6px}
 .steps code{font-family:var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px}
 @media (max-width:760px){.hero .wide{grid-column:1/-1}.tabbar{grid-template-columns:repeat(5,1fr)!important}.tabbar .nav{font-size:10px;padding:6px 0}
@@ -325,7 +331,7 @@ function showFatal(msg) {
   if (a) a.innerHTML = '<div class="loading" style="color:#A23838;max-width:640px;margin:0 auto;padding:60px 16px">' + String(msg).replace(/[<]/g, '&lt;') + '<\/div>';
 }
 function lineNo(e) { var m = String((e && e.stack) || '').match(/:(\d+):\d+\)?\s*$/m); return m ? Number(m[1]) : 0; }
-var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 322, __MAIN_LBL_LINE = 347;
+var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 328, __MAIN_LBL_LINE = 353;
 window.onerror = function (m, s, l, c) {
   var info = '';
   try {
@@ -764,17 +770,35 @@ function ingExpert() {
   const names = (S.data.ingredients || []).slice(0, 4).map(i => i.name);
   const sugg = [names[0] ? `${names[0]} ต่างจากสารที่คล้ายกันอย่างไร และเหมาะกับผิวแบบไหน` : 'PDRN คืออะไร เหมาะกับผิวแบบไหน',
     'ส่วนผสมไหนกำลังมาแรงในเกาหลีปีนี้ และมีหลักฐานอะไรบ้าง', 'ถ้าจะนำเข้าสินค้าที่มี Retinal ต้องระวังเรื่องกฎ อย. อะไรบ้าง', 'Peptide ชนิดไหนนิยมใช้ในสกินแคร์ลดริ้วรอย'];
-  if (!on) return `<div class="card"><h2>ยังไม่ได้เปิดใช้ผู้เชี่ยวชาญ<\/h2>
-    <p class="sub" style="margin:8px 0 12px">ผู้เชี่ยวชาญใช้ Claude ตอบจากคลังข้อมูลส่วนผสมของทีม และค้นเว็บเพิ่มพร้อมลิงก์อ้างอิง ต้องมีรหัส Claude API ก่อน (คิดค่าใช้จ่ายตามการใช้งานจริง)<\/p>
-    ${isAdmin ? `<ol class="steps"><li>สมัคร/ล็อกอิน <a href="https:\/\/console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com<\/a> แล้วเติมเครดิต (Billing)<\/li>
-      <li>เมนู API Keys → Create Key → คัดลอกรหัส<\/li><li>Apps Script → Project Settings → Script properties → เพิ่ม <code>ANTHROPIC_API_KEY<\/code> = รหัสที่ได้ → Save<\/li><li>รีเฟรชหน้านี้ (ไม่ต้อง Deploy ใหม่)<\/li><\/ol>` : '<p class="sub">ติดต่อผู้ดูแลระบบให้เปิดใช้งาน<\/p>'}
-    <p class="sub" style="font-size:12px;margin-top:10px">ระหว่างนี้ดูข้อมูลส่วนผสมได้ที่แท็บ "รายงานส่วนผสมมาแรง"<\/p><\/div>`;
+  if (!on) return qaView();
   return `<section class="card chat">
     <div class="msgs" id="msgs">${chat.length ? chat.map(chatBubble).join('') : `<div class="empty">ถามได้ทุกเรื่องเกี่ยวกับส่วนผสมเครื่องสำอาง: กลไกการทำงาน ความเข้มข้นที่ใช้ การจับคู่ส่วนผสม ข้อกำหนด อย. ราคาวัตถุดิบ หรือเทรนด์ในเกาหลี ญี่ปุ่น จีน ฝรั่งเศส<\/div>`}<\/div>
     ${chat.length ? '' : `<div class="chips sugg">${sugg.map(s => `<button class="chip" data-sugg="${esc(s)}">${esc(s)}<\/button>`).join('')}<\/div>`}
     <form class="ask" id="askf" onsubmit="return false"><textarea id="askq" rows="2" placeholder="พิมพ์คำถาม… (Enter ส่ง, Shift+Enter ขึ้นบรรทัดใหม่)">${esc(S.askDraft || '')}<\/textarea>
       <div class="ask-acts">${chat.length ? '<button type="button" class="btn ghost sm" id="chatClear">เริ่มบทสนทนาใหม่<\/button>' : '<span><\/span>'}<button class="btn" id="askBtn">ถาม<\/button><\/div><\/form>
     <p class="sub" style="font-size:11.5px;margin:8px 0 0">คำตอบสร้างโดย Claude จากคลังข้อมูลของทีมและการค้นเว็บ ตรวจลิงก์อ้างอิงก่อนนำไปใช้ตัดสินใจ · ไม่ใช่คำแนะนำทางการแพทย์<\/p><\/section>`;
+}
+// ถาม-ตอบผ่านคิว: Claude ในแอปของผู้ดูแลมารับคำถามไปค้นคว้าแล้วตอบ ทุก 30 นาที (08:00–20:00) ไม่มีค่าใช้จ่ายรายคำถาม
+function qaView() {
+  const all = S.data.qa || [], f = (S.qaq || '').trim().toLowerCase();
+  const list = all.filter(x => !f || (x.question + ' ' + x.answer).toLowerCase().includes(f));
+  const mine = all.filter(x => x.status === 'pending');
+  const last = S.data.expert && S.data.expert.lastAnswerRun;
+  const isAdmin = S.user.role === 'admin';
+  return `<section class="card chat">
+    <div class="card-h"><h2>ถามผู้เชี่ยวชาญส่วนผสม<\/h2><span class="hint">Claude รับคำถามไปค้นคว้าและตอบทุก 30 นาที (08:00–20:00) พร้อมแหล่งอ้างอิง${last ? ' · เช็คล่าสุด ' + fmtDate(last) + ' ' + new Date(last).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : ''}<\/span><\/div>
+    <form class="ask" id="qaf" onsubmit="return false"><textarea id="qaq" rows="3" placeholder="พิมพ์คำถาม เช่น PDRN จากปลาแซลมอนกับจากพืชต่างกันอย่างไร ใช้ความเข้มข้นเท่าไร">${esc(S.askDraft || '')}<\/textarea>
+      <div class="ask-acts"><span class="sub" style="font-size:12px">${mine.length ? `รอคำตอบ ${mine.length} ข้อ` : 'คำตอบจะขึ้นในหน้านี้ให้ทุกคนในทีมเห็น'}<\/span><button class="btn" id="qaSend">ส่งคำถาม<\/button><\/div><\/form>
+    <div class="toolbar" style="margin:4px 0 0"><input type="search" id="qaSearch" placeholder="ค้นในคำถาม-คำตอบที่มีแล้ว" value="${esc(S.qaq || '')}"><\/div>
+    <div class="qa-list">${list.length ? list.map(x => `<article class="qa ${x.status}">
+        <div class="qa-q"><b>${esc(x.question)}<\/b><span class="sub">${esc(x.userName || x.user)} · ${fmtDate(x.time)}<\/span>
+          ${x.status === 'pending' ? '<span class="pill st-few">รอ Claude ตอบ<\/span>' : '<span class="pill st-contacted">ตอบแล้ว<\/span>'}
+          ${isAdmin || x.user === S.user.username ? `<button class="btn ghost sm" data-qadel="${esc(x.id)}">ลบ<\/button>` : ''}<\/div>
+        ${x.status === 'answered' ? `<div class="msg assistant">${md(x.answer)}${x.sources.length ? `<div class="msrc"><b>แหล่งอ้างอิง<\/b><ol>${x.sources.map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a><\/li>`).join('')}<\/ol><\/div>` : ''}
+          <div class="by">ตอบโดย Claude · ${fmtDate(x.answeredAt)} · ตรวจแหล่งอ้างอิงก่อนนำไปใช้ตัดสินใจ<\/div><\/div>` : ''}
+      <\/article>`).join('') : `<div class="empty">${f ? 'ไม่พบคำถามที่ตรงกับคำค้น' : 'ยังไม่มีคำถาม ลองถามเรื่องส่วนผสมที่สนใจได้เลย'}<\/div>`}<\/div>
+    ${isAdmin ? '<p class="sub" style="font-size:11.5px;margin:0">ผู้ดูแล: ถ้าต้องการให้ตอบทันทีแบบแชต ใส่ ANTHROPIC_API_KEY ใน Script properties (คิดค่าใช้จ่ายตามการใช้งาน) · งานตอบคำถามรันในแอป Claude บนเครื่อง TEAM ต้องเปิดแอปไว้<\/p>' : ''}
+  <\/section>`;
 }
 function chatBubble(m) {
   return `<div class="msg ${m.role}">${m.role === 'user' ? `<p>${esc(m.text)}<\/p>` : md(m.text)}
@@ -808,6 +832,30 @@ function bindIngredients() {
     if (S.askDraft) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
   }
   const cl = $('#chatClear'); if (cl) cl.onclick = () => { S.chat = []; chatSave(); renderPage(); };
+  // คิวถาม-ตอบ
+  const qq = $('#qaq');
+  if (qq) {
+    qq.oninput = () => { S.askDraft = qq.value; };
+    const send = async () => {
+      const b = $('#qaSend'); busy(b, true);
+      try { S.data.qa = await call('askQueue', S.token, qq.value); S.askDraft = ''; toast('ส่งคำถามแล้ว Claude จะตอบภายในราว 30 นาที (ช่วง 08:00–20:00)'); renderPage(); }
+      catch (e) { toast(e.message); busy(b, false); }
+    };
+    $('#qaSend').onclick = send;
+    qq.onkeydown = e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); send(); } };
+    if (S.askDraft) { qq.focus(); qq.setSelectionRange(qq.value.length, qq.value.length); }
+  }
+  const qs = $('#qaSearch'); if (qs) qs.oninput = () => { const pos = qs.selectionStart; S.qaq = qs.value; renderPage(); const n = $('#qaSearch'); n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} };
+  document.querySelectorAll('[data-qadel]').forEach(b => b.onclick = async () => {
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'ยืนยันลบ'; return; }
+    busy(b, true); try { S.data.qa = await call('deleteQA', S.token, b.dataset.qadel); renderPage(); } catch (e) { toast(e.message); busy(b, false); }
+  });
+  // มีคำถามรอคำตอบ → เช็คคำตอบใหม่ทุก 1 นาทีขณะเปิดแท็บนี้
+  clearTimeout(S.qaTimer);
+  if (qq && (S.data.qa || []).some(x => x.status === 'pending')) S.qaTimer = setTimeout(async () => {
+    if (S.page !== 'ingredients' || S.itab !== 'expert' || document.activeElement === document.getElementById('qaq')) return;
+    try { S.data.qa = await call('listQA', S.token); renderPage(); } catch (e) {}
+  }, 60000);
   if (S.asking) { const ab = $('#askBtn'); if (ab) ab.disabled = true; }
   const box = $('#msgs'); if (box) box.scrollTop = box.scrollHeight;
 }
