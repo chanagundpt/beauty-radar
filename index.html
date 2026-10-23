@@ -11,7 +11,7 @@
 :root{
   --lilac:#A47DAB; --lilac-ink:#6B4873; --lilac-btn:#865F8E; --lilac-soft:#F3ECF5; --lilac-line:#E3D6E6;
   --bg:#F8F6FA; --card:#FFFFFF; --ink:#1F2340; --muted:#6B6F86; --line:#E7E4EE;
-  --kr-bg:#FDE6EE; --kr-fg:#A3385F; --jp-bg:#ECE8FB; --jp-fg:#5446B8; --cn-bg:#E0F3EC; --cn-fg:#23765F; --gl-bg:#EEF0F4; --gl-fg:#4A5068; --th-bg:#FFF1DE; --th-fg:#94591A;
+  --kr-bg:#FDE6EE; --kr-fg:#A3385F; --jp-bg:#ECE8FB; --jp-fg:#5446B8; --cn-bg:#E0F3EC; --cn-fg:#23765F; --gl-bg:#EEF0F4; --gl-fg:#4A5068; --th-bg:#FFF1DE; --th-fg:#94591A; --fr-bg:#E3ECFB; --fr-fg:#2F5AA8;
   --a-bg:#E3F3EA; --a-fg:#22704A; --b-bg:#FFF0DC; --b-fg:#91561A; --c-bg:#FBE3E3; --c-fg:#A23838;
   --hero:linear-gradient(135deg,#F1E8F4 0%,#FCEAF1 100%);
   --f:"Anuphan",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
@@ -64,7 +64,7 @@ h2{font-size:15px;margin:0;font-weight:600}
 .chip:hover{border-color:var(--lilac-line);color:var(--ink)}
 .chip.on{background:var(--lilac-btn);border-color:var(--lilac-btn);color:#fff}
 .cc{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
-.cc.KR{background:var(--kr-bg);color:var(--kr-fg)}.cc.JP{background:var(--jp-bg);color:var(--jp-fg)}.cc.CN{background:var(--cn-bg);color:var(--cn-fg)}.cc.GLOBAL{background:var(--gl-bg);color:var(--gl-fg)}.cc.TH{background:var(--th-bg);color:var(--th-fg)}
+.cc.KR{background:var(--kr-bg);color:var(--kr-fg)}.cc.JP{background:var(--jp-bg);color:var(--jp-fg)}.cc.CN{background:var(--cn-bg);color:var(--cn-fg)}.cc.GLOBAL{background:var(--gl-bg);color:var(--gl-fg)}.cc.TH{background:var(--th-bg);color:var(--th-fg)}.cc.FR{background:var(--fr-bg);color:var(--fr-fg)}
 .lv{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:99px;white-space:nowrap}
 .lv.A{background:var(--a-bg);color:var(--a-fg)}.lv.B{background:var(--b-bg);color:var(--b-fg)}.lv.C{background:var(--c-bg);color:var(--c-fg)}
 .tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:6px;background:var(--bg);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
@@ -268,7 +268,7 @@ setTimeout(function () {
 
 <script>
 const LBL = {
-  market: { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', TH: 'ไทย', GLOBAL: 'ภาพรวม' },
+  market: { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส', TH: 'ไทย', GLOBAL: 'ภาพรวม' },
   category: { skincare: 'สกินแคร์', makeup: 'เมคอัพ', both: 'สกินแคร์+เมคอัพ' },
   kind: { ingredient: 'ส่วนผสม', product: 'สินค้า', brand: 'แบรนด์', award: 'รางวัล/อันดับ', market: 'ภาพตลาด' },
   level: { A: 'A ทางการ', B: 'B รอง', C: 'C รอตรวจ' },
@@ -338,7 +338,7 @@ function renderLogin(msg) {
   document.getElementById('app').innerHTML = `
   <div class="login"><form class="login-card" id="loginForm">
     <div class="brandmark"><div class="dot">2N<\/div>2NK <span>Beauty Radar<\/span><\/div>
-    <p>ติดตามเทรนด์เครื่องสำอางและสกินแคร์ เกาหลี ญี่ปุ่น จีน ทุกข้อมูลมีแหล่งอ้างอิง<\/p>
+    <p>ติดตามเทรนด์เครื่องสำอางและสกินแคร์ เกาหลี ญี่ปุ่น จีน ฝรั่งเศส ทุกข้อมูลมีแหล่งอ้างอิง<\/p>
     <div class="grid" style="gap:12px">
       <label class="f">ชื่อผู้ใช้<input type="text" id="lu" autocomplete="username" autocapitalize="none" required><\/label>
       <label class="f">รหัสผ่าน<input type="password" id="lp" autocomplete="current-password" required><\/label>
@@ -472,7 +472,7 @@ function pRadar() {
   const last = d.auto && d.auto.lastRun;
   return `
   <div class="top"><div><h1>เทรนด์ล่าสุด<\/h1><p class="sub">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชั่วโมง · ล่าสุด ${last ? fmtDate(last) + ' ' + new Date(last).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'รอรอบแรก'} · ทุกรายการกดดูแหล่งที่มาได้<\/p><\/div>
-    <div class="grid" style="gap:8px">${filterChips(S.f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน' }, 'ทุกตลาด')}${filterChips(S.f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด')}<\/div><\/div>
+    <div class="grid" style="gap:8px">${filterChips(S.f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกตลาด')}${filterChips(S.f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด')}<\/div><\/div>
   <div class="hero">
     <div><div class="k">หลักฐานในมุมมองนี้<\/div><div class="v">${fmtN(ev.length)}<small>รายการ<\/small><\/div><\/div>
     <div><div class="k">ระดับความน่าเชื่อถือ<\/div><div class="v" style="font-size:16px;padding-top:6px"><span class="lv A">A ${cnt.A}<\/span> <span class="lv B">B ${cnt.B}<\/span> <span class="lv C">C ${cnt.C}<\/span><\/div>
@@ -658,7 +658,7 @@ function pBrands() {
     <div class="chips">${isAdmin ? `<button class="btn ghost" id="importPack">${nProf ? 'อัปเดตข้อมูลแบรนด์ชุดล่าสุด' : 'นำเข้าข้อมูลแบรนด์ 15 แบรนด์'}<\/button>` : ''}<button class="btn" data-newbrand>+ เพิ่มแบรนด์<\/button><\/div><\/div>
   <div class="toolbar">
     <input type="search" id="bq" placeholder="ค้นหาแบรนด์ สินค้า ส่วนผสม" value="${esc(f.q)}">
-    ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
+    ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
   <\/div>
