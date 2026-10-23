@@ -261,6 +261,35 @@ td .t{font-weight:600}
 .keybox code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all;flex:1 1 220px}
 .ytl{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
 .yt-ic{flex:none;width:20px;height:14px;border-radius:4px;background:#E2504C;color:#fff;font-size:8px;display:grid;place-items:center;margin-top:3px}
+/* Trend Ingredient */
+.hero .wide{grid-column:span 3}
+.ing header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ing h3{margin:0;font-size:19px;line-height:1.3}
+.prices{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:6px}
+.pr{display:flex;justify-content:space-between;gap:12px;padding:9px 12px;border-top:1px solid var(--line);font-size:13px;align-items:flex-start}
+.pr:first-child{border-top:0}
+.pr>div:first-child{display:flex;flex-direction:column;min-width:0}
+.pr span{color:var(--muted);font-size:12px}
+.pv{text-align:right;white-space:nowrap}
+.pv .num{font-size:14px;font-weight:600;color:var(--ink)}
+.chat{display:flex;flex-direction:column;gap:12px}
+.msgs{display:flex;flex-direction:column;gap:12px;max-height:min(62vh,640px);overflow-y:auto;padding:4px 2px}
+.msg{max-width:min(760px,92%);border-radius:14px;padding:10px 14px;font-size:14px;line-height:1.65}
+.msg p{margin:0 0 8px}.msg p:last-child{margin-bottom:0}
+.msg ul{margin:4px 0 8px;padding-left:20px}.msg h4{margin:8px 0 4px;font-size:14px}
+.msg.user{align-self:flex-end;background:var(--lilac-btn);color:#fff}
+.msg.assistant{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
+.msg.thinking{color:var(--muted);font-style:italic}
+.msrc{margin-top:8px;padding-top:8px;border-top:1px dashed var(--lilac-line);font-size:12px}
+.msrc ol{margin:4px 0 0;padding-left:18px}
+.ask textarea{min-height:64px}
+.ask-acts{display:flex;justify-content:space-between;align-items:center;margin-top:8px;gap:8px}
+.sugg .chip{text-align:left;white-space:normal}
+.steps{margin:0;padding-left:20px;font-size:14px}.steps li{margin-bottom:6px}
+.steps code{font-family:var(--mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px}
+@media (max-width:760px){.hero .wide{grid-column:1/-1}.tabbar{grid-template-columns:repeat(5,1fr)!important}.tabbar .nav{font-size:10px;padding:6px 0}
+  .ing header{flex-direction:column}.msg{max-width:100%}
+  .pr{flex-direction:column;gap:4px}.pv{text-align:left;white-space:normal}}
 /* แท็บหน้าแบรนด์ */
 .tabs{display:flex;gap:4px;box-shadow:inset 0 -1px 0 var(--line);margin:0 0 16px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -296,7 +325,7 @@ function showFatal(msg) {
   if (a) a.innerHTML = '<div class="loading" style="color:#A23838;max-width:640px;margin:0 auto;padding:60px 16px">' + String(msg).replace(/[<]/g, '&lt;') + '<\/div>';
 }
 function lineNo(e) { var m = String((e && e.stack) || '').match(/:(\d+):\d+\)?\s*$/m); return m ? Number(m[1]) : 0; }
-var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 293, __MAIN_LBL_LINE = 318;
+var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 322, __MAIN_LBL_LINE = 347;
 window.onerror = function (m, s, l, c) {
   var info = '';
   try {
@@ -351,6 +380,7 @@ const ICON = {
   brands: '<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19l1-5.8L3.5 9.2l5.9-.9z" />',
   sources: '<circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />',
   users: '<circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6" />',
+  ingredients: '<path d="M9 3h6M10 3v6L4.5 18.5A1.7 1.7 0 0 0 6 21h12a1.7 1.7 0 0 0 1.5-2.5L14 9V3" /><path d="M7 15h10" />',
   account: '<circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" />',
 };
 const S = { token: null, user: null, data: null, page: 'radar', brandId: null, bf: { market: '', category: '', verdict: '', q: '' }, f: { market: '', category: '' }, ef: { market: '', category: '', level: '', kind: '', q: '' }, users: null };
@@ -424,6 +454,7 @@ async function boot() {
     S.user = S.data.user;
     S.page = load('br_page') || 'radar';
     S.btab = load('br_btab') || 'trend';
+    S.itab = load('br_itab') || 'report';
     if ((S.page === 'users' && S.user.role !== 'admin') || S.page === 'account') S.page = 'radar';
     renderShell();
   } catch (e) { if (S.token) renderLogin(e.message); }
@@ -432,7 +463,7 @@ async function refresh() { S.data = await call('getBoot', S.token); S.user = S.d
 
 // ---------- shell ----------
 function navItems() {
-  return [['radar', 'เทรนด์'], ['evidence', 'หลักฐาน'], ['brands', 'แบรนด์'], ['sources', 'แหล่งข้อมูล']];
+  return [['radar', 'Trend Brand', 'แบรนด์มาแรง'], ['ingredients', 'Trend Ingredient', 'ส่วนผสม'], ['evidence', 'หลักฐาน', 'หลักฐาน'], ['brands', 'แบรนด์', 'แบรนด์'], ['sources', 'แหล่งข้อมูล', 'แหล่งข้อมูล']];
 }
 function renderShell() {
   const items = navItems();
@@ -443,7 +474,7 @@ function renderShell() {
       ${items.map(([k, t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}
     <\/aside>
     <main id="page"><\/main>
-    <nav class="tabbar">${items.map(([k, t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}<\/nav>
+    <nav class="tabbar">${items.map(([k, , t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}<\/nav>
   <\/div>`;
   document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => go(b.dataset.p));
   renderPage();
@@ -496,7 +527,7 @@ function renderPage() {
   document.querySelectorAll('[data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === navKey));
   const el = document.getElementById('page');
   const bar = `<div class="pbar">${brandLogo('mlogo')}${acctHtml()}<\/div>`;
-  const fn = { radar: pRadar, evidence: pEvidence, brands: pBrands, report: pReport, sources: pSources, users: pUsers }[S.page] || pRadar;
+  const fn = { radar: pRadar, ingredients: pIngredients, evidence: pEvidence, brands: pBrands, report: pReport, sources: pSources, users: pUsers }[S.page] || pRadar;
   el.innerHTML = bar + fn();
   bindAcct();
   bindPage();
@@ -526,7 +557,7 @@ function pRadar() {
   const tnews = d.news.filter(n => n.subject.indexOf('TREND|') === 0 && (!S.f.market || n.subject === 'TREND|' + S.f.market));
   const last = d.auto && d.auto.lastRun;
   return `
-  <div class="top"><div><h1>เทรนด์ล่าสุด<\/h1><p class="sub">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชั่วโมง · ล่าสุด ${last ? fmtDate(last) + ' ' + new Date(last).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'รอรอบแรก'} · ทุกรายการกดดูแหล่งที่มาได้<\/p><\/div>
+  <div class="top"><div><h1>Trend Brand<\/h1><p class="sub">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชั่วโมง · ล่าสุด ${last ? fmtDate(last) + ' ' + new Date(last).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'รอรอบแรก'} · ทุกรายการกดดูแหล่งที่มาได้<\/p><\/div>
     <div class="grid" style="gap:8px">${filterChips(S.f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกตลาด')}${filterChips(S.f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด')}<\/div><\/div>
   <div class="hero">
     <div><div class="k">หลักฐานในมุมมองนี้<\/div><div class="v">${fmtN(ev.length)}<small>รายการ<\/small><\/div><\/div>
@@ -657,6 +688,129 @@ function igBlock(ig, on) {
     ${t.example ? `<a class="btn ghost sm" href="${safeUrl(t.example)}" target="_blank" rel="noopener">ดูโพสต์<\/a>` : ''}<\/div>`).join('')}<\/div>`;
 }
 
+// ---------- page: Trend Ingredient ----------
+const ING_CAT = { active: 'สารออกฤทธิ์', peptide: 'เปปไทด์', botanical: 'สารสกัดพืช', barrier: 'เสริมเกราะผิว', brightening: 'ผิวกระจ่างใส', antiaging: 'ชะลอวัย',
+  acne: 'ดูแลสิว', sunscreen: 'กันแดด', hydration: 'ให้ความชุ่มชื้น', biotech: 'ไบโอเทค', other: 'อื่นๆ' };
+function ingNews(name) { return S.data.news.filter(n => n.subject === 'ING|' + name).sort((a, b) => b.publishedAt - a.publishedAt); }
+function ingList() {
+  const d = S.data, have = {};
+  const list = (d.ingredients || []).map(i => (have[i.name.toLowerCase()] = 1, Object.assign({ full: true }, i)));
+  // คำสำคัญที่มีข่าวแต่ยังไม่มีข้อมูลค้นคว้า → การ์ดย่อ
+  (d.keywords || []).filter(k => k.active && !have[k.label.toLowerCase()]).forEach(k => list.push({ name: k.label, nameTh: '', aliases: k.keyword.split(','), category: 'other', full: false, why: [], prices: [], products: [], sources: [], regulation: ['', []], summary: '' }));
+  const now = Date.now(), m30 = n => n.publishedAt >= now - 30 * 864e5;
+  list.forEach(i => { const n = ingNews(i.name); i.news = n; i.n30 = n.filter(m30).length; i.nPrev = n.filter(x => x.publishedAt < now - 30 * 864e5 && x.publishedAt >= now - 60 * 864e5).length; });
+  return list.sort((a, b) => (b.full - a.full) || b.n30 - a.n30 || a.name.localeCompare(b.name));
+}
+function pIngredients() {
+  const tab = S.itab === 'expert' ? 'expert' : 'report';
+  const head = `<div class="top"><div><h1>Trend Ingredient<\/h1><p class="sub">${tab === 'report' ? 'ส่วนผสมที่กำลังนิยมในการผลิตเครื่องสำอาง ราคาวัตถุดิบในตลาด และข่าวล่าสุด · ทุกข้อกดตัวเลขดูแหล่งที่มา' : 'ถามผู้เชี่ยวชาญด้านส่วนผสมเครื่องสำอางและสกินแคร์ ตอบจากคลังข้อมูลของทีมและค้นเว็บพร้อมแหล่งอ้างอิง'}<\/p><\/div><\/div>
+    <div class="tabs" role="tablist">
+      <button role="tab" class="tab${tab === 'report' ? ' on' : ''}" data-itab="report">รายงานส่วนผสมมาแรง <span class="num">${(S.data.ingredients || []).length}<\/span><\/button>
+      <button role="tab" class="tab${tab === 'expert' ? ' on' : ''}" data-itab="expert">ผู้เชี่ยวชาญส่วนผสม<\/button><\/div>`;
+  return head + (tab === 'report' ? ingReport() : ingExpert());
+}
+function ingReport() {
+  const f = S.igf || (S.igf = { q: '', cat: '' }), q = f.q.trim().toLowerCase();
+  const all = ingList();
+  const list = all.filter(i => (!f.cat || i.category === f.cat) && (!q || (i.name + ' ' + i.nameTh + ' ' + i.aliases.join(' ') + ' ' + i.summary).toLowerCase().includes(q)));
+  const rising = all.filter(i => i.n30 > 0).sort((a, b) => b.n30 - a.n30).slice(0, 5);
+  const cats = {}; all.forEach(i => { if (i.full) cats[i.category] = ING_CAT[i.category] || i.category; });
+  return `
+  ${rising.length ? `<div class="hero"><div><div class="k">ส่วนผสมในคลัง<\/div><div class="v">${fmtN((S.data.ingredients || []).length)}<small>รายการ<\/small><\/div><\/div>
+    <div class="wide"><div class="k">ถูกพูดถึงในข่าวมากสุด 30 วัน<\/div><div class="chips" style="margin-top:6px">${rising.map(i => `<span class="tag" style="font-size:13px">${esc(i.name)} <b class="num">${i.n30}<\/b><\/span>`).join('')}<\/div><\/div><\/div>` : ''}
+  <div class="toolbar"><input type="search" id="igq" placeholder="ค้นหาส่วนผสม เช่น PDRN, เปปไทด์, ลดเลือนริ้วรอย" value="${esc(f.q)}">
+    <div class="chips">${[['', 'ทุกกลุ่ม']].concat(Object.entries(cats)).map(([k, t]) => `<button class="chip${f.cat === k ? ' on' : ''}" data-igcat="${k}">${esc(t)}<\/button>`).join('')}<\/div><\/div>
+  ${list.length ? `<div class="bgrid">${list.map(ingCard).join('')}<\/div>` : '<div class="empty">ยังไม่มีข้อมูลส่วนผสม ระบบค้นข่าวส่วนผสมทุกวัน และ Claude ค้นคว้าข้อมูลเชิงลึก + ราคาวัตถุดิบให้ทุกจันทร์และพฤหัส<\/div>'}`;
+}
+function ingCard(i) {
+  const c = i.n30 || i.nPrev ? (i.nPrev ? Math.round((i.n30 - i.nPrev) / i.nPrev * 100) : null) : undefined;
+  const trend = c === undefined ? '' : `<span class="tag">ข่าว 30 วัน <b class="num">${i.n30}<\/b>${c == null ? ' · ใหม่' : ` · <span class="${c > 5 ? 'up' : c < -5 ? 'down' : ''}">${c > 0 ? '+' : ''}${c}%<\/span>`}<\/span>`;
+  return `<article class="bcard ing">
+    <header><div><h3>${esc(i.name)}<\/h3>${i.nameTh ? `<div class="sub">${esc(i.nameTh)}<\/div>` : ''}
+      <div class="bc-m" style="margin-top:6px"><span class="pill st-shortlist">${esc(ING_CAT[i.category] || 'อื่นๆ')}<\/span>${trend}${i.aliases.length ? `<span>${esc(i.aliases.slice(0, 3).join(' · '))}<\/span>` : ''}<\/div><\/div>
+      <button class="btn ghost sm" data-askabout="${esc(i.name)}">ถามผู้เชี่ยวชาญ<\/button><\/header>
+    ${i.full ? `
+      ${i.summary ? `<p class="why" style="margin:0;font-size:14px">${esc(i.summary)}<\/p>` : ''}
+      ${i.why.length ? `<div class="herop"><div class="lbl">ทำไมกำลังมาแรง<\/div><ul>${i.why.map(w => `<li>${esc(w[0])}${refs(i, w[1])}<\/li>`).join('')}<\/ul><\/div>` : ''}
+      <div class="sec"><div class="lbl">ราคาวัตถุดิบในตลาด<\/div>${i.prices.length ? `<div class="prices">${i.prices.map(p => { const s = i.sources[p[4]] || []; return `<div class="pr"><div><b>${esc(p[0])}<\/b><span>${esc(p[2])}${p[3] ? ' · ข้อมูล ' + esc(p[3]) : ''}<\/span><\/div>
+          <div class="pv"><span class="num">${esc(p[1])}<\/span>${refs(i, [p[4]])} ${s[2] ? lv(s[2]) : ''}<\/div><\/div>`; }).join('')}<\/div>
+        <p class="sub" style="font-size:11.5px;margin:6px 0 0">ราคาขึ้นกับเกรด ความบริสุทธิ์ ปริมาณสั่ง และผู้ขาย ใช้ประกอบการประเมินเบื้องต้นเท่านั้น<\/p>` : '<div class="empty" style="padding:10px">ยังไม่มีข้อมูลราคาที่มีแหล่งยืนยัน<\/div>'}<\/div>
+      ${i.regulation && i.regulation[0] ? `<div class="sec thai"><span class="lbl">ข้อกำหนด อย./ASEAN<\/span> <span class="tn">${esc(i.regulation[0])}${refs(i, i.regulation[1])}<\/span><\/div>` : ''}
+      ${i.products.length ? `<div class="sec"><div class="lbl">แบรนด์/สินค้าที่ใช้<\/div><div class="plist">${i.products.map(p => `<div class="pi"><b>${esc(p[0])}<\/b><span>${esc(p[1])}${p[2] >= 0 ? refs(i, [p[2]]) : ''}<\/span><\/div>`).join('')}<\/div><\/div>` : ''}`
+    : '<div class="empty" style="padding:10px">ยังไม่มีข้อมูลเชิงลึก (Claude จะค้นคว้าให้ในรอบถัดไป) ระหว่างนี้ดูข่าวด้านล่างได้<\/div>'}
+    ${i.news.length ? `<div class="sec"><div class="lbl">ข่าวล่าสุด<\/div><div class="rows">${i.news.slice(0, 3).map(n => `<div class="row"><div style="min-width:0">${newsTitle(n)}<div class="s">${n.market === 'KR' ? cc('KR') + ' ' : ''}${esc(n.publisher)} · ${fmtDate(n.publishedAt)}<\/div><\/div><\/div>`).join('')}<\/div><\/div>` : ''}
+    ${i.sources.length ? `<details class="srcs"><summary>แหล่งอ้างอิง ${i.sources.length} แห่ง${i.updatedAt ? ' · อัปเดต ' + fmtDate(i.updatedAt) : ''}<\/summary><ol>${i.sources.map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a> ${lv(s[2])}<\/li>`).join('')}<\/ol><\/details>` : ''}
+  <\/article>`;
+}
+// ---------- ผู้เชี่ยวชาญส่วนผสม ----------
+function chatLoad() { if (!S.chat) { try { S.chat = JSON.parse(sessionStorage.getItem('br_chat') || '[]'); } catch (e) { S.chat = []; } } return S.chat; }
+function chatSave() { try { sessionStorage.setItem('br_chat', JSON.stringify(S.chat.slice(-30))); } catch (e) {} }
+// แสดงคำตอบแบบ Markdown อย่างง่าย (หัวข้อ, ตัวหนา, รายการ) โดยยังกัน HTML ทุกอย่าง
+function md(text) {
+  const lines = esc(text).split('\n'), out = []; let list = null;
+  const inline = s => s.replace(/\*\*(.+?)\*\*/g, '<b>$1<\/b>').replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1<\/a>');
+  lines.forEach(l => {
+    const m = l.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)$/);
+    if (m) { if (!list) { list = []; } list.push('<li>' + inline(m[1]) + '<\/li>'); return; }
+    if (list) { out.push('<ul>' + list.join('') + '<\/ul>'); list = null; }
+    const h = l.match(/^#{1,4}\s+(.*)$/);
+    if (h) out.push('<h4>' + inline(h[1]) + '<\/h4>'); else if (l.trim()) out.push('<p>' + inline(l) + '<\/p>');
+  });
+  if (list) out.push('<ul>' + list.join('') + '<\/ul>');
+  return out.join('');
+}
+function ingExpert() {
+  const chat = chatLoad(), on = S.data.expert && S.data.expert.enabled, isAdmin = S.user.role === 'admin';
+  const names = (S.data.ingredients || []).slice(0, 4).map(i => i.name);
+  const sugg = [names[0] ? `${names[0]} ต่างจากสารที่คล้ายกันอย่างไร และเหมาะกับผิวแบบไหน` : 'PDRN คืออะไร เหมาะกับผิวแบบไหน',
+    'ส่วนผสมไหนกำลังมาแรงในเกาหลีปีนี้ และมีหลักฐานอะไรบ้าง', 'ถ้าจะนำเข้าสินค้าที่มี Retinal ต้องระวังเรื่องกฎ อย. อะไรบ้าง', 'Peptide ชนิดไหนนิยมใช้ในสกินแคร์ลดริ้วรอย'];
+  if (!on) return `<div class="card"><h2>ยังไม่ได้เปิดใช้ผู้เชี่ยวชาญ<\/h2>
+    <p class="sub" style="margin:8px 0 12px">ผู้เชี่ยวชาญใช้ Claude ตอบจากคลังข้อมูลส่วนผสมของทีม และค้นเว็บเพิ่มพร้อมลิงก์อ้างอิง ต้องมีรหัส Claude API ก่อน (คิดค่าใช้จ่ายตามการใช้งานจริง)<\/p>
+    ${isAdmin ? `<ol class="steps"><li>สมัคร/ล็อกอิน <a href="https:\/\/console.anthropic.com" target="_blank" rel="noopener">console.anthropic.com<\/a> แล้วเติมเครดิต (Billing)<\/li>
+      <li>เมนู API Keys → Create Key → คัดลอกรหัส<\/li><li>Apps Script → Project Settings → Script properties → เพิ่ม <code>ANTHROPIC_API_KEY<\/code> = รหัสที่ได้ → Save<\/li><li>รีเฟรชหน้านี้ (ไม่ต้อง Deploy ใหม่)<\/li><\/ol>` : '<p class="sub">ติดต่อผู้ดูแลระบบให้เปิดใช้งาน<\/p>'}
+    <p class="sub" style="font-size:12px;margin-top:10px">ระหว่างนี้ดูข้อมูลส่วนผสมได้ที่แท็บ "รายงานส่วนผสมมาแรง"<\/p><\/div>`;
+  return `<section class="card chat">
+    <div class="msgs" id="msgs">${chat.length ? chat.map(chatBubble).join('') : `<div class="empty">ถามได้ทุกเรื่องเกี่ยวกับส่วนผสมเครื่องสำอาง: กลไกการทำงาน ความเข้มข้นที่ใช้ การจับคู่ส่วนผสม ข้อกำหนด อย. ราคาวัตถุดิบ หรือเทรนด์ในเกาหลี ญี่ปุ่น จีน ฝรั่งเศส<\/div>`}<\/div>
+    ${chat.length ? '' : `<div class="chips sugg">${sugg.map(s => `<button class="chip" data-sugg="${esc(s)}">${esc(s)}<\/button>`).join('')}<\/div>`}
+    <form class="ask" id="askf" onsubmit="return false"><textarea id="askq" rows="2" placeholder="พิมพ์คำถาม… (Enter ส่ง, Shift+Enter ขึ้นบรรทัดใหม่)">${esc(S.askDraft || '')}<\/textarea>
+      <div class="ask-acts">${chat.length ? '<button type="button" class="btn ghost sm" id="chatClear">เริ่มบทสนทนาใหม่<\/button>' : '<span><\/span>'}<button class="btn" id="askBtn">ถาม<\/button><\/div><\/form>
+    <p class="sub" style="font-size:11.5px;margin:8px 0 0">คำตอบสร้างโดย Claude จากคลังข้อมูลของทีมและการค้นเว็บ ตรวจลิงก์อ้างอิงก่อนนำไปใช้ตัดสินใจ · ไม่ใช่คำแนะนำทางการแพทย์<\/p><\/section>`;
+}
+function chatBubble(m) {
+  return `<div class="msg ${m.role}">${m.role === 'user' ? `<p>${esc(m.text)}<\/p>` : md(m.text)}
+    ${m.sources && m.sources.length ? `<div class="msrc"><b>แหล่งอ้างอิงจากเว็บ<\/b><ol>${m.sources.map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a><\/li>`).join('')}<\/ol><\/div>` : ''}<\/div>`;
+}
+async function sendAsk(text) {
+  const q = String(text || '').trim(); if (!q || S.asking) return;
+  chatLoad().push({ role: 'user', text: q }); S.askDraft = ''; S.asking = true; chatSave(); renderPage();
+  const box = document.getElementById('msgs'); if (box) { box.insertAdjacentHTML('beforeend', '<div class="msg assistant thinking">กำลังค้นคว้าและเรียบเรียงคำตอบ… (ราว 20–60 วินาที)<\/div>'); box.scrollTop = box.scrollHeight; }
+  try {
+    const r = await call('askExpert', S.token, q, S.chat.slice(0, -1).map(m => ({ role: m.role, text: m.text })));
+    S.chat.push({ role: 'assistant', text: r.answer + (r.truncated ? '\n\n(คำตอบยาวเกินและถูกตัด ลองถามให้แคบลง)' : ''), sources: r.sources });
+  } catch (e) {
+    S.chat.push({ role: 'assistant', text: e.message === 'EXPERT_NOT_CONFIGURED' ? 'ยังไม่ได้ตั้งรหัส Claude API (ANTHROPIC_API_KEY)' : 'ถามไม่สำเร็จ: ' + e.message });
+  }
+  S.asking = false; chatSave(); renderPage();
+  const b2 = document.getElementById('msgs'); if (b2) b2.scrollTop = b2.scrollHeight;
+}
+function bindIngredients() {
+  const $ = s => document.querySelector(s);
+  document.querySelectorAll('[data-itab]').forEach(b => b.onclick = () => { S.itab = b.dataset.itab; store('br_itab', S.itab); renderPage(); });
+  document.querySelectorAll('[data-igcat]').forEach(b => b.onclick = () => { S.igf.cat = b.dataset.igcat; renderPage(); });
+  const q = $('#igq'); if (q) q.oninput = () => { const pos = q.selectionStart; S.igf.q = q.value; renderPage(); const n = $('#igq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch (e) {} };
+  document.querySelectorAll('[data-askabout]').forEach(b => b.onclick = () => { S.itab = 'expert'; store('br_itab', 'expert'); S.askDraft = `อธิบาย ${b.dataset.askabout} ให้หน่อย: ทำงานอย่างไร ใช้ความเข้มข้นเท่าไร เหมาะกับผิวแบบไหน และทำไมกำลังมาแรง`; renderPage(); window.scrollTo(0, 0); });
+  document.querySelectorAll('[data-sugg]').forEach(b => b.onclick = () => sendAsk(b.dataset.sugg));
+  const ta = $('#askq');
+  if (ta) {
+    ta.oninput = () => { S.askDraft = ta.value; };
+    ta.onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendAsk(ta.value); } };
+    $('#askBtn').onclick = () => sendAsk(ta.value);
+    if (S.askDraft) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+  }
+  const cl = $('#chatClear'); if (cl) cl.onclick = () => { S.chat = []; chatSave(); renderPage(); };
+  if (S.asking) { const ab = $('#askBtn'); if (ab) ab.disabled = true; }
+  const box = $('#msgs'); if (box) box.scrollTop = box.scrollHeight;
+}
 // ---------- page: evidence ----------
 function evFiltered() {
   const f = S.ef, q = f.q.trim().toLowerCase();
@@ -1208,6 +1362,7 @@ function bindPage() {
   $$('[data-report]').forEach(b => b.onclick = () => go('report', b.dataset.report));
   $$('[data-editbrand]').forEach(b => b.onclick = () => brandForm(S.data.brands.find(x => x.id === b.dataset.editbrand)));
   bindCands();
+  if (S.page === 'ingredients') bindIngredients();
   if (S.page === 'brands') {
     const nb = $('[data-newbrand]'); if (nb) nb.onclick = () => brandForm();
     $$('[data-bk]').forEach(b => b.onclick = () => { S.bf[b.dataset.bk] = b.dataset.fv; renderPage(); });
