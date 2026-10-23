@@ -227,7 +227,8 @@ td .t{font-weight:600}
 .blogo{display:inline-flex;flex-direction:column;align-items:center;gap:5px;--lh:40px}
 .blogo img{height:var(--lh);width:auto;display:block}
 .blogo span{font-size:max(9px, calc(var(--lh) * .26));letter-spacing:.3em;margin-right:-.3em;color:var(--lilac-btn);font-weight:600;white-space:nowrap;line-height:1}
-.blogo.side{--lh:46px;margin:4px 12px 28px;align-self:flex-start}
+/* ห้ามใช้ชื่อคลาส side (ชนกับแถบเมนู .side) */
+.blogo.slogo{--lh:46px;margin:4px 12px 28px;align-self:flex-start}
 .blogo.lg{--lh:60px;margin:0 auto 18px;display:flex;width:max-content}
 .login-card>p:first-of-type{text-align:center}
 .blogo.mlogo{--lh:28px;gap:3px}
@@ -293,7 +294,7 @@ function showFatal(msg) {
   if (a) a.innerHTML = '<div class="loading" style="color:#A23838;max-width:640px;margin:0 auto;padding:60px 16px">' + String(msg).replace(/[<]/g, '&lt;') + '<\/div>';
 }
 function lineNo(e) { var m = String((e && e.stack) || '').match(/:(\d+):\d+\)?\s*$/m); return m ? Number(m[1]) : 0; }
-var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 290, __MAIN_LBL_LINE = 315;
+var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 291, __MAIN_LBL_LINE = 316;
 window.onerror = function (m, s, l, c) {
   var info = '';
   try {
@@ -436,7 +437,7 @@ function renderShell() {
   document.getElementById('app').innerHTML = `
   <div class="shell">
     <aside class="side">
-      ${brandLogo('side')}
+      ${brandLogo('slogo')}
       ${items.map(([k, t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}
     <\/aside>
     <main id="page"><\/main>
