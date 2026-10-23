@@ -430,6 +430,7 @@ function renderPage() {
   el.innerHTML = bar + fn();
   bindAcct();
   bindPage();
+  translateVisible();
 }
 
 // ---------- page: radar ----------
@@ -492,6 +493,32 @@ function plainTitle(t) { return String(t || '').replace(/\s+-\s+[^-]{2,80}$/, ''
 function newsTitle(n) {
   const orig = plainTitle(n.title), th = n.titleTh && n.titleTh !== orig ? n.titleTh : '';
   return `<a href="${safeUrl(n.link || n.url)}" target="_blank" rel="noopener" class="nlink">${esc(th || orig)}<\/a>${th ? `<span class="orig">${esc(orig)}<\/span>` : ''}`;
+}
+// ข่าว/คลิปที่อยู่บนจอแต่ยังไม่มีคำแปล → ขอให้เซิร์ฟเวอร์แปลทันที (ขอครั้งเดียวต่อรายการ ถ้าเซิร์ฟเวอร์ยังไม่รองรับก็ข้ามเงียบๆ)
+const TR_TRIED = {};
+function needTh(t, th) { return !th && t && !/[฀-๿]/.test(t); }
+function translateVisible() {
+  const d = S.data; if (!d) return;
+  let news = [], vids = [];
+  if (S.page === 'radar') news = d.news.filter(n => n.subject.indexOf('TREND|') === 0 && (!S.f.market || n.subject === 'TREND|' + S.f.market)).slice(0, 8);
+  if (S.page === 'report') {
+    const b = d.brands.find(x => x.id === S.brandId); if (!b) return;
+    const P = partnerScore(b);
+    news = P.news.slice(0, 10);
+    vids = (d.videos || []).filter(x => x.subject === b.name).slice(0, 8);
+  }
+  const ask = (kind, list, idOf) => {
+    const ids = list.filter(x => idOf(x) && needTh(x.title, x.titleTh) && !TR_TRIED[kind + idOf(x)]).map(idOf);
+    if (!ids.length) return;
+    ids.forEach(i => TR_TRIED[kind + i] = 1);
+    call('translateTitles', S.token, kind, ids).then(map => {
+      let changed = false;
+      list.forEach(x => { const th = map[idOf(x)]; if (th) { x.titleTh = th; changed = true; } });
+      if (changed) renderPage();
+    }).catch(() => {});
+  };
+  ask('news', news, x => x.id);
+  ask('videos', vids, x => x.key);
 }
 function ytThaiBlock(d) {
   if (!d.connectors.youtube) return `<div class="empty"><b>ยังไม่ได้เปิด YouTube Data API<\/b> เปิดได้ฟรีในหน้าแก้โค้ด Apps Script: บริการ (+) → YouTube Data API v3 → เพิ่ม (ดูขั้นตอนใน README)<\/div>`;
