@@ -171,6 +171,7 @@ td .t{font-weight:600}
 .bc-m{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:3px}
 .vd{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
 .v-own{background:var(--a-bg);color:var(--a-fg)}
+.v-few,.st-few{background:var(--b-bg);color:var(--b-fg)}
 .fda{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
 .fda .lbl{margin:0}.fda .tn{color:var(--muted);flex-basis:100%;font-size:12.5px}
 .v-pri{background:var(--lilac-btn);color:#fff}.v-con{background:var(--lilac-soft);color:var(--lilac-ink)}.v-ben{background:var(--gl-bg);color:var(--gl-fg)}
@@ -660,7 +661,7 @@ function pBrands() {
     <input type="search" id="bq" placeholder="ค้นหาแบรนด์ สินค้า ส่วนผสม" value="${esc(f.q)}">
     ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', FR: 'ฝรั่งเศส' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด').replace(/data-fk=/g, 'data-bk=')}
-    ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
+    ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', few: 'มีในไทยแล้ว (จำนวนน้อย)', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
   <\/div>
   ${candSection()}
   <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์ใน Watchlist<\/p>
@@ -672,13 +673,14 @@ function pBrands() {
 function candList() {
   const c = (S.data.candidates || []).slice();
   // ยังไม่มีใน อย. มาก่อน (โอกาสนำเข้า) แล้วเรียงตามจำนวนข่าว
-  const rank = x => (x.fdaChecked && !x.fdaApproved ? 0 : !x.fdaChecked ? 1 : 2);
+  const rank = x => (x.fdaChecked && !x.fdaApproved ? 0 : x.fdaChecked && !x.fdaOwn && fdaFew(x.fdaApproved) ? 1 : !x.fdaChecked ? 2 : 3);
   return c.sort((a, b) => rank(a) - rank(b) || b.mentions30 - a.mentions30 || a.name.localeCompare(b.name));
 }
 function candFda(c) {
   if (!c.fdaChecked) return '<span class="pill st-watch">ยังไม่ได้เช็ค อย.<\/span>';
   if (!c.fdaApproved) return '<span class="pill st-contacted">ยังไม่มีใน อย. ไทย<\/span>';
-  return `<span class="pill ${c.fdaOwn ? 'st-shortlist' : 'st-rejected'}" title="${esc(c.fdaOperators.map(o => o[0] + ' (' + o[1] + ')').join(', '))}">${c.fdaOwn ? '2NK นำเข้าแล้ว' : 'มีใน อย. แล้ว ' + fmtN(c.fdaApproved) + ' รายการ'}<\/span>`;
+  const few = !c.fdaOwn && fdaFew(c.fdaApproved);
+  return `<span class="pill ${c.fdaOwn ? 'st-shortlist' : few ? 'st-few' : 'st-rejected'}" title="${esc(c.fdaOperators.map(o => o[0] + ' (' + o[1] + ')').join(', '))}">${c.fdaOwn ? '2NK นำเข้าแล้ว' : few ? 'มีในไทยแล้ว ' + c.fdaApproved + ' รายการ · จำนวนน้อย อาจนำเข้าได้' : 'มีใน อย. แล้ว ' + fmtN(c.fdaApproved) + ' รายการ'}<\/span>`;
 }
 function candCard(c) {
   const src = c.source.indexOf('claude') >= 0 ? (c.source.indexOf('auto') >= 0 ? 'ระบบ + Claude' : 'Claude ค้นคว้า') : 'ระบบหาเอง';
@@ -750,14 +752,18 @@ function brandForm(b) {
 }
 
 // ---------- brand profiles ----------
-const VERDICT = { priority: ['น่าสนใจนำเข้า', 'v-pri'], consider: ['น่าพิจารณา', 'v-con'], benchmark: ['มีในไทยแล้ว · ใช้เทียบเคียง', 'v-ben'], own: ['2NK นำเข้าแล้ว', 'v-own'] };
-const VERDICT_ORDER = { priority: 0, consider: 1, benchmark: 2, own: 3 };
+// ใบจดแจ้ง อย. น้อยกว่านี้ = มีในไทยแล้วแต่จำนวนน้อย ผู้นำเข้าเดิมอาจไม่ใช่ตัวแทนแต่เพียงผู้เดียว → เรายังหาข้อมูลเพื่อนำเข้าได้
+const FDA_FEW = 10;
+const VERDICT = { priority: ['น่าสนใจนำเข้า', 'v-pri'], consider: ['น่าพิจารณา', 'v-con'], few: ['มีในไทยแล้ว (จำนวนน้อย อาจนำเข้าได้)', 'v-few'],
+  benchmark: ['มีในไทยแล้ว · ใช้เทียบเคียง', 'v-ben'], own: ['2NK นำเข้าแล้ว', 'v-own'] };
+const VERDICT_ORDER = { priority: 0, consider: 1, few: 2, benchmark: 3, own: 4 };
+function fdaFew(n) { return n > 0 && n < FDA_FEW; }
 function profOf(b) { return b ? (S.data.profiles || {})[(b.name || '').toLowerCase()] || null : null; }
 function fdaOf(b) { return b ? (S.data.fda || {})[(b.name || '').toLowerCase()] || null : null; }
 // ผล อย. (ข้อมูลทางการ) มาก่อนคำแนะนำในชุดวิจัย: มีใบจดแจ้งอนุมัติแล้ว = มีในไทยแล้ว, ผู้ประกอบการเป็น 2NK = เรานำเข้าเอง
 function verdictOf(b) {
   const f = fdaOf(b);
-  if (f && f.approved > 0) return f.own ? 'own' : 'benchmark';
+  if (f && f.approved > 0) return f.own ? 'own' : fdaFew(f.approved) ? 'few' : 'benchmark';
   const p = profOf(b);
   return p ? p.verdict : '';
 }
@@ -766,7 +772,9 @@ function fdaLine(b) {
   const link = `<a href="${page}" target="_blank" rel="noopener">ระบบค้นข้อมูล อย.<\/a>`;
   if (!f) return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="tn">ยังไม่ได้ตรวจ · ตรวจเองได้ที่ ${link} (ค้นชื่อการค้า + สถานะอนุมัติ)<\/span><\/div>`;
   if (!f.approved) return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="pill st-contacted">ไม่พบใบจดแจ้งที่อนุมัติ<\/span> <span class="tn">ค้นชื่อการค้า "${esc(b.name)}" ใน ${link} · ตรวจเมื่อ ${fmtDate(f.checkedAt)}<\/span><\/div>`;
-  return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="pill ${f.own ? 'st-shortlist' : 'st-rejected'}">อนุมัติ ${fmtN(f.approved)} รายการ${f.own ? ' · มี 2NK' : ''}<\/span> ${lv('A')}
+  const few = !f.own && fdaFew(f.approved);
+  return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="pill ${f.own ? 'st-shortlist' : few ? 'st-few' : 'st-rejected'}">อนุมัติ ${fmtN(f.approved)} รายการ${f.own ? ' · มี 2NK' : few ? ' · จำนวนน้อย อาจนำเข้าได้' : ''}<\/span> ${lv('A')}
+    ${few ? `<div class="tn">มีสินค้าจดแจ้งแค่ไม่กี่รายการ ผู้นำเข้าเดิมอาจไม่ใช่ตัวแทนนำเข้าและจัดจำหน่ายแต่เพียงผู้เดียวในไทย ควรหาข้อมูลเพิ่ม (ติดต่อแบรนด์ / ตรวจสัญญาตัวแทน) ก่อนตัดสินใจ<\/div>` : ''}
     <div class="tn">ผู้ประกอบการ: ${f.operators.slice(0, 4).map(o => `${esc(o[0])} (${o[1]})`).join(', ')}${f.operators.length > 4 ? ` และอีก ${f.operators.length - 4} ราย` : ''}<\/div>
     <div class="tn">ที่มา: ${link} · ค้นชื่อการค้า "${esc(b.name)}" สถานะอนุมัติ · ตรวจเมื่อ ${fmtDate(f.checkedAt)}<\/div><\/div>`;
 }
