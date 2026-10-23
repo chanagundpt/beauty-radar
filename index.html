@@ -618,7 +618,7 @@ function change(points) {
   return prev ? (now - prev) / prev * 100 : null;
 }
 function trendBlock(trends, on) {
-  if (!trends.length) return `<div class="empty">${on ? 'ตั้งค่า Naver แล้ว แต่ยังไม่มีข้อมูล ให้ผู้ดูแลกด <b>"ดึงข้อมูลตอนนี้"<\/b> ที่หน้าแหล่งข้อมูล' : '<b>ยังไม่ได้เชื่อม Naver DataLab<\/b> สมัคร API ฟรีที่ developers.naver.com แล้วใส่ NAVER_CLIENT_ID / NAVER_CLIENT_SECRET ตามขั้นตอนใน README'}<\/div>`;
+  if (!trends.length) return `<div class="empty">${on ? 'ตั้งค่า Naver แล้ว แต่ยังไม่มีข้อมูล ให้ผู้ดูแลกด <b>"ดึงข้อมูลตอนนี้"<\/b> ที่หน้าแหล่งข้อมูล' : '<b>ยังไม่ได้เชื่อม Naver DataLab<\/b> สมัคร NAVER API HUB (เลือก Search Trend) ที่ Naver Cloud Platform แล้วใส่ NAVER_CLIENT_ID / NAVER_CLIENT_SECRET ใน Script properties ตามขั้นตอนใน README'}<\/div>`;
   const list = trends.map(t => ({ t, c: change(t.points) })).sort((a, b) => (b.c == null ? -1e9 : b.c) - (a.c == null ? -1e9 : a.c));
   return `<div class="kwgrid">${list.map(({ t, c }) => `<div class="kw"><div class="n"><span>${esc(t.label)}<\/span>${c == null ? '<span class="num flat">–<\/span>' : `<span class="num ${c > 5 ? 'up' : c < -5 ? 'down' : 'flat'}">${c > 0 ? '+' : ''}${c.toFixed(0)}%<\/span>`}<\/div>${spark(t.points)}<\/div>`).join('')}<\/div>
     <p class="sub" style="font-size:12px;margin-top:8px">% = ค่าเฉลี่ย 4 สัปดาห์ล่าสุดเทียบ 4 สัปดาห์ก่อนหน้า · อัปเดต ${fmtDate(Math.max(...trends.map(t => t.fetchedAt)))}<\/p>`;
