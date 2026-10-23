@@ -215,6 +215,21 @@ td .t{font-weight:600}
 .acct-menu button:hover{background:var(--lilac-soft);color:var(--lilac-ink)}
 .acct-menu .out{color:var(--c-fg)}
 .orig{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+/* ป้ายด้านขวาของแถว ไม่ยืดตามความสูงข้อความ */
+.sig>.lv,.row>.lv,.row>.vd,.row>.btn,.row>.num{align-self:start;justify-self:end;margin-top:2px}
+/* แบรนด์น่าจับตา */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
+.cand{border:1px solid var(--line);border-radius:14px;padding:14px;background:var(--card);display:flex;flex-direction:column;gap:8px;min-width:0}
+.cand h3{margin:0;font-size:16px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.cand .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted)}
+.cand .why{font-size:13px;margin:0}
+.cand ul{margin:0;padding-left:18px;font-size:12.5px}
+.cand li{margin-bottom:2px;word-break:break-word}
+.cand .acts{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap;margin-top:auto;border-top:1px solid var(--line);padding-top:10px}
+.keybox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.keybox code{font-family:var(--mono);font-size:12px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;word-break:break-all;flex:1 1 220px}
+details.cands-wrap>summary{cursor:pointer;list-style:none}
+details.cands-wrap>summary::-webkit-details-marker{display:none}
 @media (max-width:760px){.pbar{margin:0 0 12px}.pbar .mlogo{display:flex;font-size:17px}.tabbar{grid-template-columns:repeat(4,1fr)}}
 @media (prefers-reduced-motion:no-preference){.chip,.btn,.nav{transition:background .15s,border-color .15s,color .15s}}
 </style>
@@ -476,6 +491,10 @@ function pRadar() {
       <section class="card"><div class="card-h"><h2>แบรนด์น่าสนใจนำเข้า<\/h2><button class="btn ghost sm" data-go="brands">ดูทุกแบรนด์<\/button><\/div>
         ${picks.length ? `<div class="rows">${picks.map(b => { const p = profOf(b); return `<div class="row"><button class="blink" data-report="${esc(b.id)}" style="min-width:0">${logo(b, 40)}<span style="min-width:0"><b>${esc(b.name)}<\/b> ${cc(b.market)}<span class="s" style="display:block">Hero: ${esc(p.hero.name)}<\/span><\/span><\/button>${verdictPill(b)}<\/div>`; }).join('')}<\/div>`
           : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์ ${S.user.role === 'admin' ? 'ไปที่หน้า "แบรนด์" แล้วกด "นำเข้าข้อมูลแบรนด์"' : ''}<\/div>`}<\/section>
+      <section class="card"><div class="card-h"><h2>แบรนด์ใหม่น่าจับตา<\/h2><button class="btn ghost sm" data-go="brands">ดูทั้งหมด<\/button><\/div>
+        ${(() => { const l = candList().slice(0, 5); return l.length ? `<div class="rows">${l.map(c => `<div class="row"><div style="min-width:0"><b>${esc(c.name)}<\/b> ${cc(c.market)}
+          <div class="s">${c.mentions30 ? c.mentions30 + ' ข่าวใน 30 วัน · ' : ''}${c.source.indexOf('claude') >= 0 ? 'Claude ค้นคว้า' : 'ระบบหาเอง'}<\/div><\/div>${candFda(c)}<\/div>`).join('')}<\/div>`
+          : '<div class="empty">ยังไม่มีแบรนด์รอคัด ระบบหาให้วันละครั้งจากข่าวเทรนด์<\/div>'; })()}<\/section>
       <section class="card"><div class="card-h"><h2>ข่าวเทรนด์ล่าสุด<\/h2><span class="hint">Google News · อัปเดตอัตโนมัติ<\/span><\/div>
         ${tnews.length ? `<div class="rows">${tnews.slice(0, 8).map(n => `<div class="row"><div style="min-width:0">${newsTitle(n)}
           <div class="s">${cc(n.subject.split('|')[1])} ${esc(n.publisher)} · ${fmtDate(n.publishedAt)}<\/div><\/div><\/div>`).join('')}<\/div>
@@ -643,10 +662,55 @@ function pBrands() {
     ${filterChips(f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด').replace(/data-fk=/g, 'data-bk=')}
     ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
   <\/div>
-  <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์<\/p>
+  ${candSection()}
+  <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์ใน Watchlist<\/p>
   ${list.length ? `<div class="bgrid">${list.map(brandCard).join('')}<\/div>`
     : d.brands.length ? `<div class="empty">ไม่พบแบรนด์ตามตัวกรองนี้<\/div>`
     : `<div class="empty"><b>ยังไม่มีแบรนด์<\/b> ${isAdmin ? 'กด "นำเข้าข้อมูลแบรนด์ 15 แบรนด์" เพื่อโหลดข้อมูลที่ค้นคว้าไว้ หรือ' : ''} กด "+ เพิ่มแบรนด์"<\/div>`}`;
+}
+// ---------- แบรนด์น่าจับตา (รอคัด) ----------
+function candList() {
+  const c = (S.data.candidates || []).slice();
+  // ยังไม่มีใน อย. มาก่อน (โอกาสนำเข้า) แล้วเรียงตามจำนวนข่าว
+  const rank = x => (x.fdaChecked && !x.fdaApproved ? 0 : !x.fdaChecked ? 1 : 2);
+  return c.sort((a, b) => rank(a) - rank(b) || b.mentions30 - a.mentions30 || a.name.localeCompare(b.name));
+}
+function candFda(c) {
+  if (!c.fdaChecked) return '<span class="pill st-watch">ยังไม่ได้เช็ค อย.<\/span>';
+  if (!c.fdaApproved) return '<span class="pill st-contacted">ยังไม่มีใน อย. ไทย<\/span>';
+  return `<span class="pill ${c.fdaOwn ? 'st-shortlist' : 'st-rejected'}" title="${esc(c.fdaOperators.map(o => o[0] + ' (' + o[1] + ')').join(', '))}">${c.fdaOwn ? '2NK นำเข้าแล้ว' : 'มีใน อย. แล้ว ' + fmtN(c.fdaApproved) + ' รายการ'}<\/span>`;
+}
+function candCard(c) {
+  const src = c.source.indexOf('claude') >= 0 ? (c.source.indexOf('auto') >= 0 ? 'ระบบ + Claude' : 'Claude ค้นคว้า') : 'ระบบหาเอง';
+  const trend = c.mentions30 ? `ถูกพูดถึง <b class="num">${c.mentions30}<\/b> ข่าวใน 30 วัน${c.mentionsPrev ? ` (ก่อนหน้า ${c.mentionsPrev})` : ''}` : '';
+  return `<article class="cand">
+    <h3>${esc(c.name)} ${cc(c.market)}<\/h3>
+    <div class="meta"><span class="tag">${src}<\/span>${candFda(c)}${trend ? `<span>${trend}<\/span>` : ''}<\/div>
+    ${c.reason ? `<p class="why">${esc(c.reason)}<\/p>` : ''}
+    ${c.sources.length ? `<ul>${c.sources.slice(0, 4).map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a> ${lv(s[2])}<\/li>`).join('')}<\/ul>` : ''}
+    ${c.links.length ? `<ul>${c.links.slice(0, 3).map(l => `<li><a href="${safeUrl(l[1])}" target="_blank" rel="noopener">${esc(l[0])}<\/a> <span class="sub" style="font-size:11px">${esc(l[2] || '')} · ${fmtDate(l[3])}<\/span><\/li>`).join('')}<\/ul>` : ''}
+    <div class="acts"><button class="btn ghost sm" data-candno="${esc(c.name)}">ไม่สนใจ<\/button><button class="btn sm" data-candadd="${esc(c.name)}">+ เพิ่มเข้า Watchlist<\/button><\/div>
+  <\/article>`;
+}
+function candSection() {
+  const list = candList();
+  const open = load('br_cands_open') !== '0';
+  return `<details class="card cands-wrap" style="margin-bottom:16px"${open ? ' open' : ''}><summary><div class="card-h" style="margin-bottom:0"><h2>แบรนด์น่าจับตา · รอคัด (${list.length})<\/h2>
+      <span class="hint">ระบบหาจากข่าวเทรนด์ทุกวัน + Claude ค้นคว้าทุกสัปดาห์ · เช็ค อย. ให้อัตโนมัติ<\/span><\/div><\/summary>
+    <div style="margin-top:12px">${list.length ? `<div class="cgrid">${list.map(candCard).join('')}<\/div>`
+      : '<div class="empty">ยังไม่มีแบรนด์รอคัด ระบบจะเพิ่มให้เองเมื่อพบแบรนด์ที่ถูกพูดถึงในข่าวเทรนด์อย่างน้อย 2 ข่าวใน 30 วัน หรือเมื่อ Claude ส่งผลค้นคว้ารายสัปดาห์<\/div>'}<\/div><\/details>`;
+}
+function bindCands() {
+  document.querySelectorAll('details.cands-wrap').forEach(d => d.ontoggle = () => store('br_cands_open', d.open ? '1' : '0'));
+  document.querySelectorAll('[data-candadd]').forEach(b => b.onclick = async () => {
+    busy(b, true);
+    try { await call('addCandidate', S.token, b.dataset.candadd); toast('เพิ่ม ' + b.dataset.candadd + ' เข้า Watchlist แล้ว'); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
+  });
+  document.querySelectorAll('[data-candno]').forEach(b => b.onclick = async () => {
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'กดอีกครั้งเพื่อยืนยัน'; return; }
+    busy(b, true);
+    try { await call('dismissCandidate', S.token, b.dataset.candno); S.data.candidates = S.data.candidates.filter(c => c.name !== b.dataset.candno); renderPage(); } catch (e) { toast(e.message); busy(b, false); }
+  });
 }
 function brandForm(b) {
   b = b || { market: 'KR', category: 'skincare', status: 'watch', thaiImporter: 'unknown' };
@@ -904,6 +968,8 @@ function pSources() {
     ${isAdmin ? '<div class="chips"><button class="btn ghost" data-newsrc>+ เพิ่มแหล่งข้อมูล<\/button><button class="btn" id="fetchNow">ดึงข้อมูลตอนนี้<\/button><\/div>' : ''}<\/div>
   <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>การเชื่อมต่อ<\/h2><div class="chips"><span class="pill st-contacted">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชม.<\/span><span class="pill st-contacted">Google News: เชื่อมแล้ว<\/span><span class="pill st-contacted">แปลหัวข่าวเป็นไทย: เปิดอยู่<\/span><span class="pill st-contacted">Wikidata (ปีก่อตั้ง): เชื่อมแล้ว<\/span>${conn(d.connectors.youtube, 'YouTube')} ${conn(d.connectors.naver, 'Naver DataLab')} ${conn(d.connectors.instagram, 'Instagram Graph API')}<\/div><\/div>
     ${d.connectors.logs.length ? `<div class="rows">${d.connectors.logs.slice(0, 6).map(l => `<div class="row"><div><b style="font-size:13px">${esc(l.job)}<\/b> <span class="s">${fmtDate(l.time)} ${new Date(l.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}<\/span><div class="s" style="word-break:break-word">${esc(l.message)}<\/div><\/div><span class="lv ${l.ok ? 'A' : 'C'}">${l.ok ? 'สำเร็จ' : 'ผิดพลาด'}<\/span><\/div>`).join('')}<\/div>` : '<div class="empty">ยังไม่เคยดึงข้อมูล<\/div>'}<\/div>
+  ${isAdmin && d.researchKey ? `<div class="card" style="margin-bottom:16px"><div class="card-h"><h2>รหัสสำหรับงานค้นคว้ารายสัปดาห์ของ Claude<\/h2><span class="hint">ใช้ส่งผลค้นคว้าแบรนด์ใหม่และแหล่งข้อมูลใหม่เข้ามาในระบบ · อย่าแชร์ให้คนอื่น<\/span><\/div>
+    <div class="keybox"><code id="rkey">${esc(d.researchKey)}<\/code><button class="btn ghost sm" id="copyKey">คัดลอก<\/button><\/div><\/div>` : ''}
   <div class="grid g-2">
     ${groups.map(([p, list]) => `<section class="card"><div class="card-h"><h2>${esc(LBL.platform[p])}<\/h2><span class="hint">${list.length} แหล่ง<\/span><\/div><div class="rows">
       ${list.map(s => { const a = acc[s.handle]; return `<div class="row"><div><b style="font-size:14px"><a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${esc(s.name)}<\/a><\/b> ${cc(s.market)}${s.active ? '' : ' <span class="tag">ปิดอยู่<\/span>'}
@@ -1002,6 +1068,7 @@ function bindPage() {
   }
   $$('[data-report]').forEach(b => b.onclick = () => go('report', b.dataset.report));
   $$('[data-editbrand]').forEach(b => b.onclick = () => brandForm(S.data.brands.find(x => x.id === b.dataset.editbrand)));
+  bindCands();
   if (S.page === 'brands') {
     $('[data-newbrand]').onclick = () => brandForm();
     $$('[data-bk]').forEach(b => b.onclick = () => { S.bf[b.dataset.bk] = b.dataset.fv; renderPage(); });
@@ -1028,6 +1095,8 @@ function bindPage() {
     if (nn) nn.onclick = async () => { busy(nn, true); nn.textContent = 'กำลังค้นข่าว…'; try { toast(await call('fetchNewsForBrand', S.token, br.id)); await refresh(); } catch (e) { toast(e.message); busy(nn, false); nn.textContent = 'ดึงข่าวตอนนี้'; } };
   }
   if (S.page === 'sources') {
+    const ck = $('#copyKey');
+    if (ck) ck.onclick = () => { const t = $('#rkey').textContent; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast('คัดลอกรหัสแล้ว'), () => toast('คัดลอกไม่ได้ ให้เลือกข้อความแล้วคัดลอกเอง')); };
     const n = $('[data-newsrc]'); if (n) n.onclick = () => srcForm();
     const k = $('[data-newkw]'); if (k) k.onclick = () => kwForm();
     $$('[data-editsrc]').forEach(b => b.onclick = () => srcForm(S.data.sources.find(x => x.id === b.dataset.editsrc)));
