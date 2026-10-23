@@ -18,7 +18,15 @@
   --r:14px;
 }
 *{box-sizing:border-box}
-html,body{height:100%}
+html,body{height:100%;max-width:100%}
+/* มือถือ: ห้ามเลื่อนซ้าย-ขวา (clip ไม่สร้างกล่องเลื่อนใหม่ จึงไม่กระทบการเลื่อนหน้า) */
+@media (max-width:760px){html,body{overflow-x:hidden}@supports (overflow-x:clip){html,body{overflow-x:clip}}}
+img,svg,video{max-width:100%}
+/* ข้อความยาวที่ไม่มีช่องว่าง (ลิงก์, รหัส, ชื่อบริษัท) ให้ตัดบรรทัดได้ ไม่ดันจอให้กว้างเกิน */
+main,.card,.bcard,.cand,.mcard,.modal-card,.rep-head{overflow-wrap:anywhere}
+main{max-width:100%}
+@media (max-width:760px){main .pill,main .vd,main .lv,main .tag,main .cc{white-space:normal;max-width:100%}main .row>.pill,main .row>.vd{max-width:46vw;text-align:center;border-radius:12px}}
+.shell>*{min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
 a{color:var(--lilac-ink)}
 button,input,select,textarea{font:inherit;color:inherit}
