@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>2NK Beauty Radar</title>
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Pastel Pro · Lilac — 80% โครงเครื่องมือวิเคราะห์ (หมึกน้ำเงินเข้ม เส้นบาง ตัวเลขโมโน) + 20% พาสเทล (ชิปประเทศ มุมโค้ง การ์ดไล่สี) */
+:root{
+  --lilac:#A47DAB; --lilac-ink:#6B4873; --lilac-btn:#865F8E; --lilac-soft:#F3ECF5; --lilac-line:#E3D6E6;
+  --bg:#F8F6FA; --card:#FFFFFF; --ink:#1F2340; --muted:#6B6F86; --line:#E7E4EE;
+  --kr-bg:#FDE6EE; --kr-fg:#A3385F; --jp-bg:#ECE8FB; --jp-fg:#5446B8; --cn-bg:#E0F3EC; --cn-fg:#23765F; --gl-bg:#EEF0F4; --gl-fg:#4A5068; --th-bg:#FFF1DE; --th-fg:#94591A;
+  --a-bg:#E3F3EA; --a-fg:#22704A; --b-bg:#FFF0DC; --b-fg:#91561A; --c-bg:#FBE3E3; --c-fg:#A23838;
+  --hero:linear-gradient(135deg,#F1E8F4 0%,#FCEAF1 100%);
+  --f:"Anuphan",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --r:14px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f);font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:var(--lilac-ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--lilac);outline-offset:2px}
+[hidden]{display:none!important}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* ---------- login ---------- */
+#app{min-height:100%}
+.login{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--hero)}
+.login-card{width:100%;max-width:380px;background:var(--card);border:1px solid var(--lilac-line);border-radius:20px;padding:32px 28px;box-shadow:0 24px 60px -36px rgba(107,72,115,.45)}
+.brandmark{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;letter-spacing:-.01em}
+.dot{width:26px;height:26px;border-radius:9px;background:linear-gradient(135deg,var(--lilac),#E7B8CB);display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+.brandmark span{color:var(--lilac-ink)}
+.login-card p{color:var(--muted);margin:6px 0 22px;font-size:14px}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.side{background:var(--card);border-right:1px solid var(--line);padding:22px 14px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh}
+.side .brandmark{margin:0 8px 22px;font-size:18px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:500;cursor:pointer;border:0;background:none;text-align:left;width:100%}
+.nav svg{width:18px;height:18px;flex:none}
+.nav:hover{background:var(--bg);color:var(--ink)}
+.nav.on{background:var(--lilac-soft);color:var(--lilac-ink);font-weight:600}
+.side .me{margin-top:auto;padding:12px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+.side .me b{display:block;color:var(--ink);font-weight:600}
+main{padding:28px 32px 48px;min-width:0;max-width:1240px}
+.top{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+h1{font-size:26px;line-height:1.25;margin:0;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:14px;margin:2px 0 0}
+h2{font-size:15px;margin:0;font-weight:600}
+.tabbar{display:none}
+
+/* ---------- components ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.card-h .hint{font-size:12px;color:var(--muted)}
+.grid{display:grid;gap:16px}
+.g-main{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+.g-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;padding:5px 13px;font-size:13px;cursor:pointer}
+.chip:hover{border-color:var(--lilac-line);color:var(--ink)}
+.chip.on{background:var(--lilac-btn);border-color:var(--lilac-btn);color:#fff}
+.cc{display:inline-block;font-size:11px;font-weight:600;padding:1px 8px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
+.cc.KR{background:var(--kr-bg);color:var(--kr-fg)}.cc.JP{background:var(--jp-bg);color:var(--jp-fg)}.cc.CN{background:var(--cn-bg);color:var(--cn-fg)}.cc.GLOBAL{background:var(--gl-bg);color:var(--gl-fg)}.cc.TH{background:var(--th-bg);color:var(--th-fg)}
+.lv{display:inline-block;font-family:var(--mono);font-size:11px;padding:1px 8px;border-radius:99px;white-space:nowrap}
+.lv.A{background:var(--a-bg);color:var(--a-fg)}.lv.B{background:var(--b-bg);color:var(--b-fg)}.lv.C{background:var(--c-bg);color:var(--c-fg)}
+.tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:6px;background:var(--bg);color:var(--muted);border:1px solid var(--line);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--lilac-btn);background:var(--lilac-btn);color:#fff;border-radius:10px;padding:8px 16px;font-weight:600;cursor:pointer;font-size:14px;white-space:nowrap}
+.btn:hover{background:var(--lilac-ink);border-color:var(--lilac-ink)}
+.btn.ghost{background:var(--card);color:var(--lilac-ink);border-color:var(--lilac-line)}
+.btn.ghost:hover{background:var(--lilac-soft)}
+.btn.sm{padding:4px 10px;font-size:12px;border-radius:8px}
+.btn.danger{background:var(--card);color:var(--c-fg);border-color:#EBC9C9}
+.btn:disabled{opacity:.55;cursor:wait}
+.hero{background:var(--hero);border:1px solid var(--lilac-line);border-radius:var(--r);padding:20px 22px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:16px}
+.hero .k{font-size:12px;color:var(--muted)}
+.hero .v{font-family:var(--mono);font-size:28px;font-weight:500;line-height:1.2}
+.hero .v small{font-size:13px;color:var(--muted);margin-left:4px}
+.hero .lvbar{display:flex;height:8px;border-radius:99px;overflow:hidden;margin-top:8px;background:var(--card)}
+.hero .lvbar i{display:block}
+.sig{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;padding:12px 0;border-top:1px solid var(--line)}
+.sig:first-child{border-top:0;padding-top:0}
+.sig .t{font-weight:600;font-size:14px}
+.sig .m{grid-column:1/-1;font-size:12px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.sig .d{grid-column:1/-1;font-size:13px;color:var(--ink);opacity:.85}
+.empty{border:1px dashed var(--lilac-line);border-radius:12px;padding:18px;color:var(--muted);font-size:13px;background:var(--bg)}
+.empty b{color:var(--ink)}
+.kwgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.kw{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kw .n{display:flex;justify-content:space-between;font-size:13px;font-weight:600;gap:6px}
+.kw svg{display:block;width:100%;height:46px;margin-top:6px}
+.up{color:var(--a-fg)}.down{color:var(--c-fg)}.flat{color:var(--muted)}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
+.row:first-child{border-top:0}
+.row .s{font-size:12px;color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:14px}
+.toolbar input[type=search]{flex:1 1 220px;min-width:0}
+input[type=text],input[type=search],input[type=password],input[type=url],select,textarea{width:100%;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:9px 12px;font-size:14px}
+select{width:auto}
+textarea{min-height:80px;resize:vertical}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lilac);box-shadow:0 0 0 3px var(--lilac-soft)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:500;color:var(--muted)}
+label.f select{width:100%}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.form .full{grid-column:1/-1}
+.req{color:var(--c-fg)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);background:#FBFAFC;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+td .t{font-weight:600}
+.pill{display:inline-block;font-size:12px;padding:2px 10px;border-radius:99px;font-weight:500;white-space:nowrap}
+.st-watch{background:var(--gl-bg);color:var(--gl-fg)}.st-shortlist{background:var(--lilac-soft);color:var(--lilac-ink)}.st-contacted{background:var(--a-bg);color:var(--a-fg)}.st-rejected{background:var(--c-bg);color:var(--c-fg)}
+.err{color:var(--c-fg);font-size:13px;min-height:1.2em;margin:8px 0 0}
+.modal{position:fixed;inset:0;background:rgba(31,35,64,.38);display:grid;place-items:center;padding:16px;z-index:50}
+.modal-card{background:var(--card);border-radius:18px;width:100%;max-width:640px;max-height:calc(100% - 32px);overflow:auto;padding:22px}
+.modal-card h2{font-size:18px;margin-bottom:14px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;flex-wrap:wrap}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+.loading{padding:60px 0;text-align:center;color:var(--muted)}
+.cards-m{display:none}
+.mcard{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card);display:flex;flex-direction:column;gap:6px}
+.mcard .top2{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}
+.mcard .acts{display:flex;gap:6px;flex-wrap:wrap}
+.cards-m{flex-direction:column;gap:10px}
+
+@media (max-width:980px){.g-main{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:760px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .side{display:none}
+  main{padding:18px 16px calc(84px + env(safe-area-inset-bottom,0px))}
+  h1{font-size:22px}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:6px 4px calc(8px + env(safe-area-inset-bottom,0px));z-index:40}
+  .tabbar .nav{flex-direction:column;gap:2px;font-size:11px;padding:6px 2px;text-align:center;justify-content:center}
+  .form{grid-template-columns:minmax(0,1fr)}
+  .tbl.hide-m{display:none}
+  .cards-m{display:flex}
+  .hero{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero .v{font-size:24px}
+}
+.logo{position:relative;width:var(--s);height:var(--s);border-radius:calc(var(--s)*.28);background:var(--lilac-soft);color:var(--lilac-ink);display:inline-grid;place-items:center;font-weight:700;font-size:calc(var(--s)*.34);overflow:hidden;border:1px solid var(--lilac-line);flex:none;letter-spacing:.02em}
+.logo img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;padding:12%}
+.blink{display:inline-flex;align-items:center;gap:10px;background:none;border:0;padding:0;cursor:pointer;text-align:left;color:var(--ink)}
+.blink:hover .t,.blink:hover b{color:var(--lilac-ink);text-decoration:underline}
+.rep-head{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;background:var(--hero);border:1px solid var(--lilac-line);border-radius:var(--r);padding:20px}
+.rep-head .logo{box-shadow:0 8px 20px -12px rgba(107,72,115,.5)}
+.links{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:10px;font-size:14px}
+.score{display:grid;grid-template-columns:150px minmax(0,1fr);gap:20px;align-items:start}
+.ring{width:130px;height:130px;display:block;margin:0 auto 8px}
+.crit{display:flex;flex-direction:column;gap:12px}
+.cr-h{display:flex;justify-content:space-between;gap:8px;font-size:13px;font-weight:600}
+.bar{height:6px;border-radius:99px;background:#F1ECF4;margin:5px 0 3px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#C7A9CD,var(--lilac))}
+.warn{background:var(--b-bg);color:var(--b-fg);border-radius:10px;padding:8px 12px;font-size:13px;margin:14px 0 0}
+.rules{margin-top:14px;font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.rules summary{cursor:pointer;color:var(--lilac-ink);font-weight:500}
+.rules ul{padding-left:18px;margin:8px 0}
+.rules p{margin:0;font-size:12px}
+@media (max-width:560px){.score{grid-template-columns:minmax(0,1fr)}}
+/* brand profile cards */
+.bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:16px;align-items:start}
+.bcard{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.bc-h{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center}
+.bc-t h3{margin:0;font-size:19px;line-height:1.3}
+.bc-t h3 .blink{font-weight:700;font-size:19px}
+.bc-m{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--muted);margin-top:3px}
+.vd{display:inline-block;font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.v-own{background:var(--a-bg);color:var(--a-fg)}
+.fda{display:flex;flex-wrap:wrap;gap:4px 6px;align-items:center;font-size:13px;border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:var(--bg)}
+.fda .lbl{margin:0}.fda .tn{color:var(--muted);flex-basis:100%;font-size:12.5px}
+.v-pri{background:var(--lilac-btn);color:#fff}.v-con{background:var(--lilac-soft);color:var(--lilac-ink)}.v-ben{background:var(--gl-bg);color:var(--gl-fg)}
+.lbl{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.herop{background:var(--hero);border:1px solid var(--lilac-line);border-radius:14px;padding:12px 14px}
+.herop .lbl{color:var(--lilac-ink)}
+.herop .hn{font-weight:700;font-size:16px;line-height:1.35}
+.herop ul,.sec ul{margin:6px 0 0;padding-left:18px;font-size:13.5px}
+.herop li,.sec li{margin-bottom:3px}
+.plist{display:flex;flex-direction:column;gap:6px}
+.pi{display:flex;flex-direction:column;border-left:3px solid var(--lilac-line);padding:2px 0 2px 10px;font-size:13px}
+.pi b{font-weight:600}
+.pi span{color:var(--muted)}
+.thai{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.thai .lbl{margin:0}
+.thai .tn{color:var(--muted)}
+.ana{border-top:1px dashed var(--lilac-line);padding-top:10px}
+.ana p{margin:0;font-size:14px}
+.ana .by{font-size:11px;color:var(--muted);margin-top:4px}
+.ref{display:inline-block;font-family:var(--mono);font-size:10px;line-height:1;padding:2px 4px;margin-left:3px;border-radius:4px;background:var(--lilac-soft);color:var(--lilac-ink);text-decoration:none;vertical-align:2px}
+.ref:hover{background:var(--lilac-btn);color:#fff}
+.srcs{font-size:12px;color:var(--muted)}
+.srcs summary{cursor:pointer;color:var(--lilac-ink);font-weight:500}
+.srcs ol{margin:6px 0 0;padding-left:20px}
+.srcs li{margin-bottom:3px}
+.bc-f{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:12px}
+.bprof{display:flex;flex-direction:column;gap:14px}
+.nlink{font-weight:500;font-size:13px;color:var(--ink);text-decoration:none}
+.nlink:hover{color:var(--lilac-ink);text-decoration:underline}
+@media (max-width:560px){.bc-h{grid-template-columns:auto minmax(0,1fr)}.bc-h .vd{grid-column:1/-1;justify-self:start}}
+/* แถบบนของหน้า: โลโก้ (มือถือ) + ปุ่มบัญชีมุมขวา */
+.pbar{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin:-12px 0 8px}
+.pbar .mlogo{display:none;margin-right:auto}
+.acct{position:relative}
+.acct-btn{width:34px;height:34px;border-radius:50%;border:1px solid var(--lilac-line);background:var(--lilac-soft);color:var(--lilac-ink);font-weight:700;font-size:14px;cursor:pointer;display:grid;place-items:center}
+.acct-btn:hover,.acct-btn[aria-expanded=true]{background:var(--lilac-btn);color:#fff;border-color:var(--lilac-btn)}
+.acct-menu{position:absolute;right:0;top:calc(100% + 6px);min-width:220px;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 18px 40px -20px rgba(31,35,64,.35);padding:6px;z-index:45}
+.acct-who{padding:8px 10px 10px;border-bottom:1px solid var(--line);margin-bottom:4px;font-size:13px}
+.acct-who b{display:block}.acct-who span{color:var(--muted);font-size:12px}
+.acct-menu button{display:flex;align-items:center;gap:8px;width:100%;border:0;background:none;padding:8px 10px;border-radius:8px;font-size:14px;cursor:pointer;text-align:left}
+.acct-menu button svg{width:16px;height:16px;color:var(--muted)}
+.acct-menu button:hover{background:var(--lilac-soft);color:var(--lilac-ink)}
+.acct-menu .out{color:var(--c-fg)}
+.orig{display:block;font-size:11.5px;color:var(--muted);margin-top:1px}
+@media (max-width:760px){.pbar{margin:0 0 12px}.pbar .mlogo{display:flex;font-size:17px}.tabbar{grid-template-columns:repeat(4,1fr)}}
+@media (prefers-reduced-motion:no-preference){.chip,.btn,.nav{transition:background .15s,border-color .15s,color .15s}}
+</style>
+</head>
+<body>
+<div id="app"><div class="loading">กำลังโหลด…</div></div>
+<div id="modal" class="modal" hidden><div class="modal-card" id="modalCard" role="dialog" aria-modal="true"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+// แสดงสาเหตุบนหน้าจอแทนการค้างที่ "กำลังโหลด…"
+function showFatal(msg) {
+  var a = document.getElementById('app');
+  if (a) a.innerHTML = '<div class="loading" style="color:#A23838;max-width:640px;margin:0 auto;padding:60px 16px">' + String(msg).replace(/[<]/g, '&lt;') + '<\/div>';
+}
+function lineNo(e) { var m = String((e && e.stack) || '').match(/:(\d+):\d+\)?\s*$/m); return m ? Number(m[1]) : 0; }
+var __probe = lineNo(new Error()); var __PROBE_FILE_LINE = 216, __MAIN_LBL_LINE = 238;
+window.onerror = function (m, s, l, c) {
+  var info = '';
+  try {
+    var shift = __probe ? __probe - __PROBE_FILE_LINE : 0, fileLine = l - shift;
+    var key = 'const LBL' + ' = {';
+    var main = [].slice.call(document.scripts).filter(function (x) { return x.text.indexOf(key) >= 0; })[0];
+    if (main) {
+      var lines = main.text.split('\n'), startLine = 0;
+      for (var i = 0; i < lines.length; i++) if (lines[i].indexOf(key) === 0) { startLine = __MAIN_LBL_LINE - i; break; }
+      var txt = lines[fileLine - startLine] || '';
+      info = ' | ไฟล์บรรทัด ' + fileLine + ' คอลัมน์ ' + c + ' | ' + txt.slice(Math.max(0, c - 60), c + 40);
+    }
+  } catch (x) {}
+  showFatal('เกิดข้อผิดพลาดในหน้าเว็บ: ' + m + ' (บรรทัด ' + l + ')' + info + ' — ส่งภาพนี้ให้ผู้พัฒนา');
+};
+setTimeout(function () {
+  if (!window.__brStarted) showFatal('สคริปต์หลักไม่ทำงาน — โค้ดในไฟล์ Index อาจวางไม่ครบ ให้ตรวจว่าบรรทัดสุดท้ายของไฟล์คือ <\/html> แล้ว Deploy เวอร์ชันใหม่');
+}, 5000);
+</script>
+
+<script>
+const LBL = {
+  market: { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน', TH: 'ไทย', GLOBAL: 'ภาพรวม' },
+  category: { skincare: 'สกินแคร์', makeup: 'เมคอัพ', both: 'สกินแคร์+เมคอัพ' },
+  kind: { ingredient: 'ส่วนผสม', product: 'สินค้า', brand: 'แบรนด์', award: 'รางวัล/อันดับ', market: 'ภาพตลาด' },
+  level: { A: 'A ทางการ', B: 'B รอง', C: 'C รอตรวจ' },
+  status: { watch: 'เฝ้าดู', shortlist: 'คัดเลือก', contacted: 'ติดต่อแล้ว', rejected: 'ไม่ไปต่อ' },
+  importer: { unknown: 'ยังไม่ตรวจ', none: 'ยังไม่มีผู้นำเข้าในไทย', exists: 'มีผู้นำเข้าในไทยแล้ว' },
+  platform: { Instagram: 'Instagram', Web: 'เว็บไซต์', Report: 'รายงาน', API: 'API' },
+  metric: { revenueGrowth: 'การเติบโตยอดขาย (% YoY)', opMargin: 'อัตรากำไรจากการดำเนินงาน (%)', founded: 'ปีที่ก่อตั้ง', revenue: 'ยอดขาย (ระบุหน่วยในหมายเหตุ)', other: 'อื่นๆ' },
+};
+// เกณฑ์คะแนนความน่าเชื่อถือคู่ค้า — แสดงให้ผู้ใช้เห็นทั้งหมด ปรับได้ที่นี่ที่เดียว
+const SCORE_RULES = [
+  { key: 'growth', label: 'การเติบโตยอดขาย', w: 25, rule: '≥20% = 100 · 10–20% = 80 · 0–10% = 60 · −10–0% = 35 · ต่ำกว่า −10% = 10',
+    grade: v => v >= 20 ? 100 : v >= 10 ? 80 : v >= 0 ? 60 : v >= -10 ? 35 : 10 },
+  { key: 'margin', label: 'อัตรากำไรจากการดำเนินงาน', w: 20, rule: '≥15% = 100 · 8–15% = 75 · 0–8% = 50 · ขาดทุน = 15',
+    grade: v => v >= 15 ? 100 : v >= 8 ? 75 : v >= 0 ? 50 : 15 },
+  { key: 'age', label: 'อายุบริษัท', w: 15, rule: '≥15 ปี = 100 · 8–14 ปี = 75 · 3–7 ปี = 50 · ต่ำกว่า 3 ปี = 25',
+    grade: y => { const a = new Date().getFullYear() - y; return a >= 15 ? 100 : a >= 8 ? 75 : a >= 3 ? 50 : 25; } },
+  { key: 'traction', label: 'กระแสในตลาด (หลักฐานในคลัง)', w: 20, rule: 'หลักฐาน A = 3, B = 2, C = 1 แต้ม × 12 สูงสุด 100',
+    grade: p => Math.min(100, p * 12) },
+  { key: 'news', label: 'ข่าวที่มีคำเตือน (180 วัน)', w: 20, rule: 'ไม่มี = 100 · 1 ข่าว = 60 · 2 ข่าวขึ้นไป = 20 (ตรวจคำ เช่น recall, lawsuit, 리콜, 召回)',
+    grade: n => n === 0 ? 100 : n === 1 ? 60 : 20 },
+];
+const LEVEL_HELP = 'A = ต้นทางหรือประกาศทางการ · B = สื่อ/บล็อกที่อ้างต้นทาง · C = ยังไม่ยืนยัน ต้องตรวจซ้ำ';
+const ICON = {
+  radar: '<path d="M12 3a9 9 0 1 0 9 9" /><path d="M12 7a5 5 0 1 0 5 5" /><path d="M12 12l7-7" />',
+  evidence: '<path d="M7 3h7l5 5v13H7z" /><path d="M14 3v5h5" /><path d="M10 13h6M10 17h6" />',
+  brands: '<path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19l1-5.8L3.5 9.2l5.9-.9z" />',
+  sources: '<circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />',
+  users: '<circle cx="9" cy="8" r="3.5" /><path d="M2.5 20a6.5 6.5 0 0 1 13 0" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14a6 6 0 0 1 3.5 6" />',
+  account: '<circle cx="12" cy="8" r="4" /><path d="M4 21a8 8 0 0 1 16 0" />',
+};
+const S = { token: null, user: null, data: null, page: 'radar', brandId: null, bf: { market: '', category: '', verdict: '', q: '' }, f: { market: '', category: '' }, ef: { market: '', category: '', level: '', kind: '', q: '' }, users: null };
+
+// ---------- infra ----------
+// เปิดหน้านี้นอก Apps Script (GitHub Pages) จะเรียกเซิร์ฟเวอร์ผ่านลิงก์ /exec นี้ — build-pages.py ใส่ให้เอง
+const API_URL = "https://script.google.com/macros/s/AKfycbx1_JMuljDO3Awky1XlTO-Lpkr-SEI9p1oIP0vQLiulwHD1KTR33IOzQrRRJvWSzkEVSg/exec";
+function call(fn, ...args) {
+  return new Promise((res, rej) => {
+    const done = r => {
+      if (r && r.ok) return res(r.data);
+      const m = (r && r.error) || 'ไม่มีการตอบกลับจากเซิร์ฟเวอร์';
+      if (m === 'SESSION_EXPIRED') { signOut(true); return rej(new Error('หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบใหม่')); }
+      rej(new Error(m));
+    };
+    if (window.google && google.script && google.script.run) {
+      google.script.run.withSuccessHandler(done).withFailureHandler(e => rej(new Error((e && e.message) || 'เชื่อมต่อเซิร์ฟเวอร์ไม่ได้')))[fn](...args);
+    } else if (API_URL) {
+      fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn, args }) })
+        .then(r => r.json()).then(done, () => rej(new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง')));
+    } else rej(new Error('ยังไม่ได้เชื่อมกับเซิร์ฟเวอร์ (API_URL)'));
+  });
+}
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function safeUrl(u) { return /^https?:\/\//i.test(u || '') ? esc(u) : '#'; }
+function store(k, v) { try { v === undefined ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(() => t.hidden = true, 2600); }
+function fmtDate(ms) { if (!ms) return '–'; const d = new Date(ms); return d.toLocaleDateString('th-TH', { day: 'numeric', month: 'short', year: '2-digit' }); }
+function fmtN(n) { return Number(n || 0).toLocaleString('en-US'); }
+function opt(map, sel, blank) { return (blank ? `<option value="">${esc(blank)}<\/option>` : '') + Object.keys(map).map(k => `<option value="${k}"${k === sel ? ' selected' : ''}>${esc(map[k])}<\/option>`).join(''); }
+function cc(m) { return m ? `<span class="cc ${esc(m)}">${esc(LBL.market[m] || m)}<\/span>` : ''; }
+function lv(l) { return `<span class="lv ${esc(l)}" title="${esc(LEVEL_HELP)}">${esc(LBL.level[l] || l)}<\/span>`; }
+function icon(k) { return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}<\/svg>`; }
+function busy(btn, on) { if (btn) btn.disabled = on; }
+
+// ---------- auth ----------
+function renderLogin(msg) {
+  document.getElementById('app').innerHTML = `
+  <div class="login"><form class="login-card" id="loginForm">
+    <div class="brandmark"><div class="dot">2N<\/div>2NK <span>Beauty Radar<\/span><\/div>
+    <p>ติดตามเทรนด์เครื่องสำอางและสกินแคร์ เกาหลี ญี่ปุ่น จีน ทุกข้อมูลมีแหล่งอ้างอิง<\/p>
+    <div class="grid" style="gap:12px">
+      <label class="f">ชื่อผู้ใช้<input type="text" id="lu" autocomplete="username" autocapitalize="none" required><\/label>
+      <label class="f">รหัสผ่าน<input type="password" id="lp" autocomplete="current-password" required><\/label>
+      <button class="btn" id="lb" style="justify-content:center;padding:11px">เข้าสู่ระบบ<\/button>
+    <\/div>
+    <p class="err" id="lerr">${esc(msg || '')}<\/p>
+    <p style="margin:0;font-size:12px">ยังไม่มีบัญชี? ติดต่อผู้ดูแลระบบเพื่อสร้างบัญชีให้<\/p>
+  <\/form><\/div>`;
+  document.getElementById('loginForm').onsubmit = async e => {
+    e.preventDefault();
+    const b = document.getElementById('lb'); busy(b, true); document.getElementById('lerr').textContent = '';
+    try {
+      const r = await call('login', document.getElementById('lu').value, document.getElementById('lp').value);
+      S.token = r.token; S.user = r.user; store('br_token', r.token);
+      await boot();
+    } catch (err) { document.getElementById('lerr').textContent = err.message; busy(b, false); }
+  };
+  document.getElementById('lu').focus();
+}
+function signOut(expired) {
+  if (S.token && !expired) call('logout', S.token).catch(() => {});
+  S.token = null; S.user = null; S.data = null; S.users = null; store('br_token');
+  renderLogin(expired ? 'หมดเวลาการใช้งาน กรุณาเข้าสู่ระบบใหม่' : '');
+}
+async function boot() {
+  document.getElementById('app').innerHTML = '<div class="loading">กำลังโหลดข้อมูล…<\/div>';
+  try {
+    S.data = await call('getBoot', S.token);
+    S.user = S.data.user;
+    S.page = load('br_page') || 'radar';
+    if ((S.page === 'users' && S.user.role !== 'admin') || S.page === 'account') S.page = 'radar';
+    renderShell();
+  } catch (e) { if (S.token) renderLogin(e.message); }
+}
+async function refresh() { S.data = await call('getBoot', S.token); S.user = S.data.user; renderPage(); }
+
+// ---------- shell ----------
+function navItems() {
+  return [['radar', 'เทรนด์'], ['evidence', 'หลักฐาน'], ['brands', 'แบรนด์'], ['sources', 'แหล่งข้อมูล']];
+}
+function renderShell() {
+  const items = navItems();
+  document.getElementById('app').innerHTML = `
+  <div class="shell">
+    <aside class="side">
+      <div class="brandmark"><div class="dot">2N<\/div>2NK <span>Radar<\/span><\/div>
+      ${items.map(([k, t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}
+    <\/aside>
+    <main id="page"><\/main>
+    <nav class="tabbar">${items.map(([k, t]) => `<button class="nav" data-p="${k}">${icon(k)}${t}<\/button>`).join('')}<\/nav>
+  <\/div>`;
+  document.querySelectorAll('[data-p]').forEach(b => b.onclick = () => go(b.dataset.p));
+  renderPage();
+}
+// ---------- เมนูบัญชีมุมขวาบน ----------
+function initials(n) { const s = String(n || '?').trim(); return esc(s.slice(0, 1).toUpperCase()); }
+function acctHtml() {
+  const isAdmin = S.user.role === 'admin';
+  return `<div class="acct"><button class="acct-btn" id="acctBtn" aria-haspopup="menu" aria-expanded="false" title="บัญชีของฉัน">${initials(S.user.name)}<\/button>
+    <div class="acct-menu" id="acctMenu" role="menu" hidden>
+      <div class="acct-who"><b>${esc(S.user.name)}<\/b><span>@${esc(S.user.username)} · ${isAdmin ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}<\/span><\/div>
+      ${isAdmin ? `<button role="menuitem" data-acct="newuser">${icon('users')}สร้างบัญชีผู้ใช้<\/button><button role="menuitem" data-acct="users">${icon('users')}จัดการผู้ใช้<\/button>` : ''}
+      <button role="menuitem" data-acct="pw">${icon('account')}เปลี่ยนรหัสผ่าน<\/button>
+      <button role="menuitem" data-acct="out" class="out">ออกจากระบบ<\/button>
+    <\/div><\/div>`;
+}
+function bindAcct() {
+  const btn = document.getElementById('acctBtn'), menu = document.getElementById('acctMenu');
+  if (!btn) return;
+  const show = on => { menu.hidden = !on; btn.setAttribute('aria-expanded', on ? 'true' : 'false'); };
+  btn.onclick = e => { e.stopPropagation(); show(menu.hidden); };
+  menu.querySelectorAll('[data-acct]').forEach(b => b.onclick = () => {
+    show(false);
+    const a = b.dataset.acct;
+    if (a === 'users') go('users');
+    else if (a === 'newuser') userForm();
+    else if (a === 'pw') pwForm();
+    else if (a === 'out') signOut(false);
+  });
+}
+document.addEventListener('click', e => { const m = document.getElementById('acctMenu'); if (m && !m.hidden && !e.target.closest('.acct')) { m.hidden = true; } });
+function pwForm() {
+  openModal(`<h2>เปลี่ยนรหัสผ่าน<\/h2><form class="grid" id="pwf" style="gap:12px" onsubmit="return false">
+      <label class="f">รหัสผ่านเดิม<input type="password" id="pw_old" autocomplete="current-password"><\/label>
+      <label class="f">รหัสผ่านใหม่<input type="password" id="pw_new" autocomplete="new-password" placeholder="อย่างน้อย 8 ตัว มีทั้งตัวอักษรและตัวเลข"><\/label>
+      <label class="f">พิมพ์รหัสผ่านใหม่อีกครั้ง<input type="password" id="pw_new2" autocomplete="new-password"><\/label><\/form>
+    <p class="err" id="pwerr"><\/p><div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="pwsave">บันทึก<\/button><\/div>`);
+  const $ = s => document.querySelector(s);
+  $('#pwsave').onclick = async ev => {
+    const n = $('#pw_new').value; $('#pwerr').textContent = '';
+    if (n !== $('#pw_new2').value) { $('#pwerr').textContent = 'รหัสผ่านใหม่สองช่องไม่ตรงกัน'; return; }
+    busy(ev.target, true);
+    try { await call('changePassword', S.token, $('#pw_old').value, n); closeModal(); toast('เปลี่ยนรหัสผ่านแล้ว'); }
+    catch (e) { $('#pwerr').textContent = e.message; busy(ev.target, false); }
+  };
+}
+function go(p, brandId) { S.page = p; S.brandId = brandId || null; store('br_page', p === 'report' ? 'brands' : p); renderPage(); window.scrollTo(0, 0); }
+function renderPage() {
+  const navKey = S.page === 'report' ? 'brands' : S.page;
+  document.querySelectorAll('[data-p]').forEach(b => b.classList.toggle('on', b.dataset.p === navKey));
+  const el = document.getElementById('page');
+  const bar = `<div class="pbar"><div class="brandmark mlogo"><div class="dot">2N<\/div>2NK <span>Radar<\/span><\/div>${acctHtml()}<\/div>`;
+  const fn = { radar: pRadar, evidence: pEvidence, brands: pBrands, report: pReport, sources: pSources, users: pUsers }[S.page] || pRadar;
+  el.innerHTML = bar + fn();
+  bindAcct();
+  bindPage();
+}
+
+// ---------- page: radar ----------
+function filtered(list) {
+  return list.filter(e => (!S.f.market || e.market === S.f.market) && (!S.f.category || e.category === S.f.category || e.category === 'both'));
+}
+function sortSignals(list) { return list.slice().sort((a, b) => (b.signalDate || '').localeCompare(a.signalDate || '') || b.addedAt - a.addedAt); }
+function filterChips(state, key, map, all) {
+  return `<div class="chips">${[['', all]].concat(Object.entries(map)).map(([k, t]) => `<button class="chip${state[key] === k ? ' on' : ''}" data-fk="${key}" data-fv="${k}">${esc(t)}<\/button>`).join('')}<\/div>`;
+}
+function sigHtml(e) {
+  return `<div class="sig"><span class="t">${esc(e.title)}<\/span>${lv(e.level)}
+    <span class="m">${cc(e.market)}<span class="tag">${esc(LBL.kind[e.kind] || e.kind)}<\/span><span>${esc(e.signalDate || 'ไม่ระบุวันที่')}<\/span>·<a href="${safeUrl(e.url)}" target="_blank" rel="noopener">${esc(e.sourceName)}<\/a><\/span><\/div>`;
+}
+function pRadar() {
+  const d = S.data, ev = filtered(d.evidence);
+  const cnt = { A: 0, B: 0, C: 0 }; ev.forEach(e => cnt[e.level] = (cnt[e.level] || 0) + 1);
+  const total = ev.length || 1;
+  const brands = {};
+  ev.filter(e => e.brand).forEach(e => { const k = e.brand.toLowerCase(); const g = brands[k] = brands[k] || { name: e.brand, n: 0, best: 'C', markets: {} }; g.n++; g.markets[e.market] = 1; if (e.level < g.best) g.best = e.level; });
+  const brandList = Object.values(brands).sort((a, b) => b.n - a.n || a.best.localeCompare(b.best)).slice(0, 8);
+  const picks = d.brands.filter(b => { const p = profOf(b); return p && verdictOf(b) === 'priority' && (!S.f.market || b.market === S.f.market) && (!S.f.category || b.category === S.f.category); }).slice(0, 6);
+  const tnews = d.news.filter(n => n.subject.indexOf('TREND|') === 0 && (!S.f.market || n.subject === 'TREND|' + S.f.market));
+  const last = d.auto && d.auto.lastRun;
+  return `
+  <div class="top"><div><h1>เทรนด์ล่าสุด<\/h1><p class="sub">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชั่วโมง · ล่าสุด ${last ? fmtDate(last) + ' ' + new Date(last).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' }) : 'รอรอบแรก'} · ทุกรายการกดดูแหล่งที่มาได้<\/p><\/div>
+    <div class="grid" style="gap:8px">${filterChips(S.f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน' }, 'ทุกตลาด')}${filterChips(S.f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด')}<\/div><\/div>
+  <div class="hero">
+    <div><div class="k">หลักฐานในมุมมองนี้<\/div><div class="v">${fmtN(ev.length)}<small>รายการ<\/small><\/div><\/div>
+    <div><div class="k">ระดับความน่าเชื่อถือ<\/div><div class="v" style="font-size:16px;padding-top:6px"><span class="lv A">A ${cnt.A}<\/span> <span class="lv B">B ${cnt.B}<\/span> <span class="lv C">C ${cnt.C}<\/span><\/div>
+      <div class="lvbar"><i style="width:${cnt.A / total * 100}%;background:#7FC7A0"><\/i><i style="width:${cnt.B / total * 100}%;background:#F0C27E"><\/i><i style="width:${cnt.C / total * 100}%;background:#EBA1A1"><\/i><\/div><\/div>
+    <div><div class="k">แบรนด์ใน Watchlist<\/div><div class="v">${fmtN(d.brands.length)}<small>แบรนด์<\/small><\/div><\/div>
+    <div><div class="k">บัญชี IG ที่ติดตาม<\/div><div class="v">${fmtN(d.sources.filter(s => s.platform === 'Instagram' && s.active).length)}<small>บัญชี<\/small><\/div><\/div>
+  <\/div>
+  <div class="grid g-main">
+    <div class="grid" style="align-content:start">
+      <section class="card"><div class="card-h"><h2>สัญญาณล่าสุด<\/h2><button class="btn ghost sm" data-go="evidence">ดูทั้งหมด<\/button><\/div>
+        ${ev.length ? `<div>${sortSignals(ev).slice(0, 8).map(sigHtml).join('')}<\/div>` : `<div class="empty">ยังไม่มีหลักฐานในตลาด/หมวดนี้ <b>เพิ่มได้ที่หน้า "หลักฐาน"<\/b><\/div>`}<\/section>
+      <section class="card"><div class="card-h"><h2>ความสนใจคำค้นในเกาหลี (Naver)<\/h2><span class="hint">ดัชนีรายสัปดาห์ 52 สัปดาห์ · สูงสุดของแต่ละคำ = 100 · <a href="https://datalab.naver.com/" target="_blank" rel="noopener">Naver DataLab<\/a><\/span><\/div>
+        ${trendBlock(d.trends, d.connectors.naver)}<\/section>
+    <\/div>
+    <div class="grid" style="align-content:start">
+      <section class="card"><div class="card-h"><h2>แบรนด์น่าสนใจนำเข้า<\/h2><button class="btn ghost sm" data-go="brands">ดูทุกแบรนด์<\/button><\/div>
+        ${picks.length ? `<div class="rows">${picks.map(b => { const p = profOf(b); return `<div class="row"><button class="blink" data-report="${esc(b.id)}" style="min-width:0">${logo(b, 40)}<span style="min-width:0"><b>${esc(b.name)}<\/b> ${cc(b.market)}<span class="s" style="display:block">Hero: ${esc(p.hero.name)}<\/span><\/span><\/button>${verdictPill(b)}<\/div>`; }).join('')}<\/div>`
+          : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์ ${S.user.role === 'admin' ? 'ไปที่หน้า "แบรนด์" แล้วกด "นำเข้าข้อมูลแบรนด์"' : ''}<\/div>`}<\/section>
+      <section class="card"><div class="card-h"><h2>ข่าวเทรนด์ล่าสุด<\/h2><span class="hint">Google News · อัปเดตอัตโนมัติ<\/span><\/div>
+        ${tnews.length ? `<div class="rows">${tnews.slice(0, 8).map(n => `<div class="row"><div style="min-width:0">${newsTitle(n)}
+          <div class="s">${cc(n.subject.split('|')[1])} ${esc(n.publisher)} · ${fmtDate(n.publishedAt)}<\/div><\/div><\/div>`).join('')}<\/div>
+          <p class="sub" style="font-size:12px;margin-top:8px">หัวข่าวภาษาไทยแปลอัตโนมัติ (คงชื่อแบรนด์ไว้) · ตัวเล็กใต้หัวข่าวคือต้นฉบับ ควรเปิดอ่านต้นฉบับก่อนนำไปใช้อ้างอิง<\/p>`
+          : `<div class="empty">ยังไม่มีข่าวเทรนด์ ระบบจะดึงให้อัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชั่วโมง${S.user.role === 'admin' ? ' หรือกด "ดึงข้อมูลตอนนี้" ที่หน้าแหล่งข้อมูล' : ''}<\/div>`}<\/section>
+      <section class="card"><div class="card-h"><h2>แบรนด์ที่คนไทยรีวิวบน YouTube<\/h2><span class="hint">90 วันล่าสุด · ยอดวิวจริงจาก YouTube<\/span><\/div>
+        ${ytThaiBlock(d)}<\/section>
+      <section class="card"><div class="card-h"><h2>แฮชแท็กเด่นใน IG (30 วัน)<\/h2><span class="hint">${fmtN(d.ig.postCount)} โพสต์<\/span><\/div>
+        ${igBlock(d.ig, d.connectors.instagram)}<\/section>
+    <\/div>
+  <\/div>`;
+}
+// หัวข่าว: แสดงคำแปลไทยเป็นหลัก และต้นฉบับตัวเล็กไว้ตรวจ (หัวข่าวไทยอยู่แล้วแสดงอย่างเดียว)
+function plainTitle(t) { return String(t || '').replace(/\s+-\s+[^-]{2,80}$/, ''); }
+function newsTitle(n) {
+  const orig = plainTitle(n.title), th = n.titleTh && n.titleTh !== orig ? n.titleTh : '';
+  return `<a href="${safeUrl(n.link || n.url)}" target="_blank" rel="noopener" class="nlink">${esc(th || orig)}<\/a>${th ? `<span class="orig">${esc(orig)}<\/span>` : ''}`;
+}
+function ytThaiBlock(d) {
+  if (!d.connectors.youtube) return `<div class="empty"><b>ยังไม่ได้เปิด YouTube Data API<\/b> เปิดได้ฟรีในหน้าแก้โค้ด Apps Script: บริการ (+) → YouTube Data API v3 → เพิ่ม (ดูขั้นตอนใน README)<\/div>`;
+  const by = {};
+  (d.videos || []).filter(v => v.market === 'TH').forEach(v => { const g = by[v.subject] = by[v.subject] || { name: v.subject, n: 0, views: 0, top: v }; g.n++; g.views += v.views; if (v.views > g.top.views) g.top = v; });
+  const list = Object.values(by).sort((a, b) => b.views - a.views).slice(0, 8);
+  if (!list.length) return `<div class="empty">ยังไม่มีวิดีโอรีวิวภาษาไทย ระบบค้นให้วันละครั้ง${S.user.role === 'admin' ? ' หรือกด "ดึงข้อมูลตอนนี้" ที่หน้าแหล่งข้อมูล' : ''}<\/div>`;
+  return `<div class="rows">${list.map(g => { const b = S.data.brands.find(x => x.name === g.name); return `<div class="row"><div style="min-width:0">${b ? `<button class="blink" data-report="${esc(b.id)}"><b>${esc(g.name)}<\/b><\/button>` : `<b>${esc(g.name)}<\/b>`}
+    <div class="s">${g.n} คลิป · <span class="num">${fmtN(g.views)}<\/span> วิว · คลิปยอดนิยม: <a href="${safeUrl(g.top.url)}" target="_blank" rel="noopener">${esc(g.top.channel)}<\/a><\/div><\/div><\/div>`; }).join('')}<\/div>
+    <p class="sub" style="font-size:12px;margin-top:8px">นับเฉพาะคลิปที่มีชื่อแบรนด์ในชื่อคลิป ค้นด้วยคำว่า "รีวิว" ในภูมิภาคไทย<\/p>`;
+}
+function spark(points) {
+  const v = points.map(p => p[1]); if (!v.length) return '';
+  const W = 160, H = 46, max = Math.max(100, ...v);
+  const x = i => 2 + i * (W - 4) / Math.max(v.length - 1, 1), y = n => H - 3 - (n / max) * (H - 8);
+  const line = v.map((n, i) => `${x(i).toFixed(1)},${y(n).toFixed(1)}`).join(' ');
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><line x1="0" x2="${W}" y1="${y(50)}" y2="${y(50)}" stroke="#EEEAF2" stroke-width="1"/>
+    <polygon points="${x(0)},${H} ${line} ${x(v.length - 1)},${H}" fill="#A47DAB" fill-opacity=".16"/><polyline points="${line}" fill="none" stroke="#865F8E" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
+    <circle cx="${x(v.length - 1)}" cy="${y(v[v.length - 1])}" r="2.6" fill="#6B4873"/><\/svg>`;
+}
+function change(points) {
+  const v = points.map(p => p[1]); if (v.length < 8) return null;
+  const avg = a => a.reduce((s, n) => s + n, 0) / a.length;
+  const now = avg(v.slice(-4)), prev = avg(v.slice(-8, -4));
+  return prev ? (now - prev) / prev * 100 : null;
+}
+function trendBlock(trends, on) {
+  if (!trends.length) return `<div class="empty">${on ? 'ตั้งค่า Naver แล้ว แต่ยังไม่มีข้อมูล ให้ผู้ดูแลกด <b>"ดึงข้อมูลตอนนี้"<\/b> ที่หน้าแหล่งข้อมูล' : '<b>ยังไม่ได้เชื่อม Naver DataLab<\/b> สมัคร API ฟรีที่ developers.naver.com แล้วใส่ NAVER_CLIENT_ID / NAVER_CLIENT_SECRET ตามขั้นตอนใน README'}<\/div>`;
+  const list = trends.map(t => ({ t, c: change(t.points) })).sort((a, b) => (b.c == null ? -1e9 : b.c) - (a.c == null ? -1e9 : a.c));
+  return `<div class="kwgrid">${list.map(({ t, c }) => `<div class="kw"><div class="n"><span>${esc(t.label)}<\/span>${c == null ? '<span class="num flat">–<\/span>' : `<span class="num ${c > 5 ? 'up' : c < -5 ? 'down' : 'flat'}">${c > 0 ? '+' : ''}${c.toFixed(0)}%<\/span>`}<\/div>${spark(t.points)}<\/div>`).join('')}<\/div>
+    <p class="sub" style="font-size:12px;margin-top:8px">% = ค่าเฉลี่ย 4 สัปดาห์ล่าสุดเทียบ 4 สัปดาห์ก่อนหน้า · อัปเดต ${fmtDate(Math.max(...trends.map(t => t.fetchedAt)))}<\/p>`;
+}
+function igBlock(ig, on) {
+  if (!ig.topTags.length) return `<div class="empty">${on ? 'เชื่อม Instagram แล้ว แต่ยังไม่มีโพสต์ใน 30 วัน ให้ผู้ดูแลกด <b>"ดึงข้อมูลตอนนี้"<\/b>' : '<b>ยังไม่ได้เชื่อม Instagram Graph API<\/b> ต้องใช้บัญชี IG แบบ Business ที่ผูกกับ Facebook Page ดูขั้นตอนใน README'}<\/div>`;
+  return `<div class="rows">${ig.topTags.slice(0, 10).map(t => `<div class="row"><div><b>${esc(t.tag)}<\/b><div class="s">${t.accounts} บัญชี · ${t.posts} โพสต์ · <span class="num">${fmtN(t.engagement)}<\/span> ไลก์+คอมเมนต์<\/div><\/div>
+    ${t.example ? `<a class="btn ghost sm" href="${safeUrl(t.example)}" target="_blank" rel="noopener">ดูโพสต์<\/a>` : ''}<\/div>`).join('')}<\/div>`;
+}
+
+// ---------- page: evidence ----------
+function evFiltered() {
+  const f = S.ef, q = f.q.trim().toLowerCase();
+  return sortSignals(S.data.evidence.filter(e => (!f.market || e.market === f.market) && (!f.category || e.category === f.category) && (!f.level || e.level === f.level) && (!f.kind || e.kind === f.kind)
+    && (!q || [e.title, e.brand, e.detail, e.sourceName].join(' ').toLowerCase().includes(q))));
+}
+function canEdit(e) { return S.user.role === 'admin' || e.addedBy === S.user.username; }
+function pEvidence() {
+  const list = evFiltered(), f = S.ef;
+  return `
+  <div class="top"><div><h1>คลังหลักฐาน<\/h1><p class="sub">ทุกรายการต้องมีลิงก์แหล่งที่มาและระดับความน่าเชื่อถือ · ${esc(LEVEL_HELP)}<\/p><\/div>
+    <button class="btn" data-newev>+ เพิ่มหลักฐาน<\/button><\/div>
+  <div class="toolbar">
+    <input type="search" id="evq" placeholder="ค้นหาหัวข้อ แบรนด์ แหล่งที่มา" value="${esc(f.q)}">
+    <select id="evm" aria-label="ตลาด">${opt(LBL.market, f.market, 'ทุกตลาด')}<\/select>
+    <select id="evc" aria-label="หมวด">${opt(LBL.category, f.category, 'ทุกหมวด')}<\/select>
+    <select id="evl" aria-label="ระดับ">${opt(LBL.level, f.level, 'ทุกระดับ')}<\/select>
+    <select id="evk" aria-label="ประเภท">${opt(LBL.kind, f.kind, 'ทุกประเภท')}<\/select>
+  <\/div>
+  <p class="sub" style="margin:-4px 0 10px">${list.length} รายการ<\/p>
+  ${list.length ? `
+  <div class="tbl hide-m"><table><thead><tr><th>สัญญาณ<\/th><th>ตลาด<\/th><th>ประเภท<\/th><th>ระดับ<\/th><th>วันที่<\/th><th>แหล่งที่มา<\/th><th><\/th><\/tr><\/thead><tbody>
+    ${list.map(e => `<tr><td><div class="t">${esc(e.title)}<\/div>${e.brand ? `<div class="sub" style="font-size:12px">แบรนด์: ${esc(e.brand)}<\/div>` : ''}${e.detail ? `<div style="font-size:12px;color:var(--muted);max-width:460px">${esc(e.detail)}<\/div>` : ''}<\/td>
+      <td>${cc(e.market)}<div class="sub" style="font-size:11px">${esc(LBL.category[e.category] || '')}<\/div><\/td><td>${esc(LBL.kind[e.kind] || e.kind)}<\/td><td>${lv(e.level)}<\/td>
+      <td class="num" style="white-space:nowrap">${esc(e.signalDate || '–')}<\/td><td><a href="${safeUrl(e.url)}" target="_blank" rel="noopener">${esc(e.sourceName)}<\/a><div class="sub" style="font-size:11px">เพิ่มโดย ${esc(e.addedBy)}<\/div><\/td>
+      <td style="white-space:nowrap">${canEdit(e) ? `<button class="btn ghost sm" data-editev="${esc(e.id)}">แก้ไข<\/button>` : ''}<\/td><\/tr>`).join('')}
+  <\/tbody><\/table><\/div>
+  <div class="cards-m">${list.map(e => `<div class="mcard"><div class="top2"><span>${cc(e.market)} <span class="tag">${esc(LBL.kind[e.kind] || e.kind)}<\/span><\/span>${lv(e.level)}<\/div>
+    <b>${esc(e.title)}<\/b>${e.detail ? `<div style="font-size:13px;color:var(--muted)">${esc(e.detail)}<\/div>` : ''}
+    <div class="sub" style="font-size:12px">${esc(e.signalDate || 'ไม่ระบุวันที่')} · <a href="${safeUrl(e.url)}" target="_blank" rel="noopener">${esc(e.sourceName)}<\/a><\/div>
+    ${canEdit(e) ? `<div class="acts"><button class="btn ghost sm" data-editev="${esc(e.id)}">แก้ไข<\/button><\/div>` : ''}<\/div>`).join('')}<\/div>`
+  : `<div class="empty">ไม่พบหลักฐานตามตัวกรองนี้<\/div>`}`;
+}
+function evForm(e) {
+  e = e || { market: 'KR', category: 'skincare', kind: 'product', level: 'B' };
+  openModal(`<h2>${e.id ? 'แก้ไขหลักฐาน' : 'เพิ่มหลักฐาน'}<\/h2>
+  <form id="evf" class="form">
+    <label class="f full">หัวข้อสัญญาณ <span class="req">*<\/span><input type="text" id="e_title" value="${esc(e.title)}" placeholder="เช่น Anua Vitamin 10 Serum อันดับ 3 @cosme 2026 H1" required><\/label>
+    <label class="f">ตลาด<select id="e_market">${opt(LBL.market, e.market)}<\/select><\/label>
+    <label class="f">หมวด<select id="e_category">${opt(LBL.category, e.category)}<\/select><\/label>
+    <label class="f">ประเภทสัญญาณ<select id="e_kind">${opt(LBL.kind, e.kind)}<\/select><\/label>
+    <label class="f">แบรนด์ (ถ้ามี)<input type="text" id="e_brand" value="${esc(e.brand)}"><\/label>
+    <label class="f">วันที่ของสัญญาณ<input type="text" id="e_date" value="${esc(e.signalDate)}" placeholder="2026-05-20 หรือ 2026-05 หรือ 2026" inputmode="numeric"><\/label>
+    <label class="f">ระดับความน่าเชื่อถือ <span class="req">*<\/span><select id="e_level">${opt(LBL.level, e.level)}<\/select><\/label>
+    <label class="f full">รายละเอียด / ตัวเลขที่อ้างอิง<textarea id="e_detail" placeholder="ใส่เฉพาะสิ่งที่แหล่งที่มาระบุจริง">${esc(e.detail)}<\/textarea><\/label>
+    <label class="f">ชื่อแหล่งที่มา <span class="req">*<\/span><input type="text" id="e_src" value="${esc(e.sourceName)}" placeholder="เช่น iStyle, CJ Newsroom" required><\/label>
+    <label class="f">ลิงก์แหล่งที่มา <span class="req">*<\/span><input type="url" id="e_url" value="${esc(e.url)}" placeholder="https://" required><\/label>
+    <p class="sub full" style="font-size:12px;margin:0">${esc(LEVEL_HELP)}<\/p>
+  <\/form>
+  <p class="err" id="everr"><\/p>
+  <div class="modal-actions">${e.id ? '<button class="btn danger" id="evarch" style="margin-right:auto">ซ่อนรายการนี้<\/button>' : ''}<button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="evsave">บันทึก<\/button><\/div>`);
+  const v = id => document.getElementById(id).value;
+  document.getElementById('evsave').onclick = async ev => {
+    busy(ev.target, true);
+    try {
+      await call('saveEvidence', S.token, { id: e.id || '', title: v('e_title'), market: v('e_market'), category: v('e_category'), kind: v('e_kind'), brand: v('e_brand'),
+        signalDate: v('e_date'), level: v('e_level'), detail: v('e_detail'), sourceName: v('e_src'), url: v('e_url') });
+      closeModal(); toast('บันทึกแล้ว'); await refresh();
+    } catch (err) { document.getElementById('everr').textContent = err.message; busy(ev.target, false); }
+  };
+  const a = document.getElementById('evarch');
+  if (a) a.onclick = async () => {
+    if (a.dataset.sure !== '1') { a.dataset.sure = '1'; a.textContent = 'กดอีกครั้งเพื่อยืนยัน'; return; }
+    busy(a, true);
+    try { await call('archiveEvidence', S.token, e.id); closeModal(); toast('ซ่อนรายการแล้ว (ยังอยู่ในชีต)'); await refresh(); }
+    catch (err) { document.getElementById('everr').textContent = err.message; busy(a, false); }
+  };
+}
+
+// ---------- page: brands ----------
+function pBrands() {
+  const d = S.data, f = S.bf, q = f.q.trim().toLowerCase(), isAdmin = S.user.role === 'admin';
+  const vOf = verdictOf;
+  const list = d.brands.filter(b => (!f.market || b.market === f.market) && (!f.verdict || vOf(b) === f.verdict) && (!f.category || b.category === f.category)
+      && (!q || (b.name + ' ' + JSON.stringify(profOf(b) || '')).toLowerCase().includes(q)))
+    .sort((a, b) => (VERDICT_ORDER[vOf(a)] ?? 9) - (VERDICT_ORDER[vOf(b)] ?? 9) || a.name.localeCompare(b.name));
+  const nProf = d.brands.filter(b => profOf(b)).length;
+  return `
+  <div class="top"><div><h1>แบรนด์<\/h1><p class="sub">โลโก้ ประเทศต้นทาง Product Hero จุดเด่น สินค้าน่าสนใจ และคำแนะนำ · ทุกข้อกดตัวเลขเพื่อดูแหล่งที่มา<\/p><\/div>
+    <div class="chips">${isAdmin ? `<button class="btn ghost" id="importPack">${nProf ? 'อัปเดตข้อมูลแบรนด์ชุดล่าสุด' : 'นำเข้าข้อมูลแบรนด์ 15 แบรนด์'}<\/button>` : ''}<button class="btn" data-newbrand>+ เพิ่มแบรนด์<\/button><\/div><\/div>
+  <div class="toolbar">
+    <input type="search" id="bq" placeholder="ค้นหาแบรนด์ สินค้า ส่วนผสม" value="${esc(f.q)}">
+    ${filterChips(f, 'market', { KR: 'เกาหลี', JP: 'ญี่ปุ่น', CN: 'จีน' }, 'ทุกประเทศ').replace(/data-fk=/g, 'data-bk=')}
+    ${filterChips(f, 'category', { skincare: 'สกินแคร์', makeup: 'เมคอัพ' }, 'ทุกหมวด').replace(/data-fk=/g, 'data-bk=')}
+    ${filterChips(f, 'verdict', { priority: 'น่าสนใจนำเข้า', consider: 'น่าพิจารณา', benchmark: 'มีในไทยแล้ว', own: '2NK นำเข้าแล้ว' }, 'ทุกคำแนะนำ').replace(/data-fk=/g, 'data-bk=')}
+  <\/div>
+  <p class="sub" style="margin:-4px 0 12px">${list.length} แบรนด์<\/p>
+  ${list.length ? `<div class="bgrid">${list.map(brandCard).join('')}<\/div>`
+    : d.brands.length ? `<div class="empty">ไม่พบแบรนด์ตามตัวกรองนี้<\/div>`
+    : `<div class="empty"><b>ยังไม่มีแบรนด์<\/b> ${isAdmin ? 'กด "นำเข้าข้อมูลแบรนด์ 15 แบรนด์" เพื่อโหลดข้อมูลที่ค้นคว้าไว้ หรือ' : ''} กด "+ เพิ่มแบรนด์"<\/div>`}`;
+}
+function brandForm(b) {
+  b = b || { market: 'KR', category: 'skincare', status: 'watch', thaiImporter: 'unknown' };
+  const isAdmin = S.user.role === 'admin';
+  openModal(`<h2>${b.id ? 'แก้ไขแบรนด์' : 'เพิ่มแบรนด์'}<\/h2>
+  <div class="form">
+    <label class="f full">ชื่อแบรนด์ <span class="req">*<\/span><input type="text" id="b_name" value="${esc(b.name)}" placeholder="สะกดให้ตรงกับช่องแบรนด์ในหลักฐาน"><\/label>
+    <label class="f">ตลาด<select id="b_market">${opt(LBL.market, b.market)}<\/select><\/label>
+    <label class="f">หมวด<select id="b_category">${opt(LBL.category, b.category)}<\/select><\/label>
+    <label class="f">สถานะ<select id="b_status">${opt(LBL.status, b.status)}<\/select><\/label>
+    <label class="f">ผู้นำเข้าในไทย<select id="b_imp">${opt(LBL.importer, b.thaiImporter)}<\/select><\/label>
+    <label class="f">เว็บไซต์แบรนด์<input type="url" id="b_web" value="${esc(b.website)}" placeholder="https://"><\/label>
+    <label class="f">ลิงก์รูปโลโก้ (ไม่บังคับ)<input type="url" id="b_logo" value="${esc(b.logoUrl)}" placeholder="ว่างไว้ = ใช้ไอคอนจากเว็บไซต์"><\/label>
+    <label class="f full">บริษัทแม่
+      <span style="display:flex;gap:8px"><select id="b_co" style="flex:1;min-width:0"><option value="">ยังไม่ระบุ<\/option>${S.data.companies.map(c => `<option value="${esc(c.id)}"${c.id === b.companyId ? ' selected' : ''}>${esc(c.name)}<\/option>`).join('')}<\/select>
+      <button type="button" class="btn ghost sm" id="b_newco">+ บริษัทใหม่<\/button><\/span><\/label>
+    <label class="f full">บันทึก<textarea id="b_note" placeholder="เช่น ราคา, ช่องทางติดต่อ, ผลตรวจเลข อย.">${esc(b.note)}<\/textarea><\/label>
+  <\/div>
+  <p class="err" id="berr"><\/p>
+  <div class="modal-actions">${b.id && isAdmin ? '<button class="btn danger" id="bdel" style="margin-right:auto">ลบแบรนด์<\/button>' : ''}<button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="bsave">บันทึก<\/button><\/div>`);
+  const v = id => document.getElementById(id).value;
+  const draft = () => ({ id: b.id || '', name: v('b_name'), market: v('b_market'), category: v('b_category'), status: v('b_status'), thaiImporter: v('b_imp'), note: v('b_note'),
+    website: v('b_web'), logoUrl: v('b_logo'), companyId: v('b_co') });
+  document.getElementById('b_newco').onclick = () => { const d = draft(); companyForm(null, async id => { d.companyId = id; brandForm(d); }, () => brandForm(d)); };
+  document.getElementById('bsave').onclick = async ev => {
+    busy(ev.target, true);
+    try { await call('saveBrand', S.token, draft()); closeModal(); toast('บันทึกแล้ว'); await refresh(); }
+    catch (err) { document.getElementById('berr').textContent = err.message; busy(ev.target, false); }
+  };
+  const del = document.getElementById('bdel');
+  if (del) del.onclick = async () => {
+    if (del.dataset.sure !== '1') { del.dataset.sure = '1'; del.textContent = 'กดอีกครั้งเพื่อยืนยันการลบ'; return; }
+    busy(del, true);
+    try { await call('deleteBrand', S.token, b.id); closeModal(); toast('ลบแล้ว'); await refresh(); }
+    catch (err) { document.getElementById('berr').textContent = err.message; busy(del, false); }
+  };
+}
+
+// ---------- brand profiles ----------
+const VERDICT = { priority: ['น่าสนใจนำเข้า', 'v-pri'], consider: ['น่าพิจารณา', 'v-con'], benchmark: ['มีในไทยแล้ว · ใช้เทียบเคียง', 'v-ben'], own: ['2NK นำเข้าแล้ว', 'v-own'] };
+const VERDICT_ORDER = { priority: 0, consider: 1, benchmark: 2, own: 3 };
+function profOf(b) { return b ? (S.data.profiles || {})[(b.name || '').toLowerCase()] || null : null; }
+function fdaOf(b) { return b ? (S.data.fda || {})[(b.name || '').toLowerCase()] || null : null; }
+// ผล อย. (ข้อมูลทางการ) มาก่อนคำแนะนำในชุดวิจัย: มีใบจดแจ้งอนุมัติแล้ว = มีในไทยแล้ว, ผู้ประกอบการเป็น 2NK = เรานำเข้าเอง
+function verdictOf(b) {
+  const f = fdaOf(b);
+  if (f && f.approved > 0) return f.own ? 'own' : 'benchmark';
+  const p = profOf(b);
+  return p ? p.verdict : '';
+}
+function fdaLine(b) {
+  const f = fdaOf(b), page = 'https:\/\/cosmetica.fda.moph.go.th\/CMT_SEARCH_FRONT_NEW\/SearchProduct';
+  const link = `<a href="${page}" target="_blank" rel="noopener">ระบบค้นข้อมูล อย.<\/a>`;
+  if (!f) return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="tn">ยังไม่ได้ตรวจ · ตรวจเองได้ที่ ${link} (ค้นชื่อการค้า + สถานะอนุมัติ)<\/span><\/div>`;
+  if (!f.approved) return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="pill st-contacted">ไม่พบใบจดแจ้งที่อนุมัติ<\/span> <span class="tn">ค้นชื่อการค้า "${esc(b.name)}" ใน ${link} · ตรวจเมื่อ ${fmtDate(f.checkedAt)}<\/span><\/div>`;
+  return `<div class="fda"><span class="lbl">อย. ไทย<\/span> <span class="pill ${f.own ? 'st-shortlist' : 'st-rejected'}">อนุมัติ ${fmtN(f.approved)} รายการ${f.own ? ' · มี 2NK' : ''}<\/span> ${lv('A')}
+    <div class="tn">ผู้ประกอบการ: ${f.operators.slice(0, 4).map(o => `${esc(o[0])} (${o[1]})`).join(', ')}${f.operators.length > 4 ? ` และอีก ${f.operators.length - 4} ราย` : ''}<\/div>
+    <div class="tn">ที่มา: ${link} · ค้นชื่อการค้า "${esc(b.name)}" สถานะอนุมัติ · ตรวจเมื่อ ${fmtDate(f.checkedAt)}<\/div><\/div>`;
+}
+function refs(p, idx) {
+  return (idx || []).map(i => { const s = p.sources[i]; return s ? `<a class="ref" href="${safeUrl(s[1])}" target="_blank" rel="noopener" title="${esc(s[0])} · ระดับ ${esc(s[2])}">${i + 1}<\/a>` : ''; }).join('');
+}
+function verdictPill(b) { const v = VERDICT[verdictOf(b)]; return v ? `<span class="vd ${v[1]}">${v[0]}<\/span>` : ''; }
+function profileBody(b, p, full) {
+  const thaiCls = b.thaiImporter === 'exists' ? 'st-rejected' : b.thaiImporter === 'none' ? 'st-contacted' : 'st-watch';
+  return `
+    <div class="herop"><div class="lbl">Product Hero<\/div><div class="hn">${esc(p.hero.name)}<\/div>
+      <ul>${p.hero.points.map(x => `<li>${esc(x[0])}${refs(p, x[1])}<\/li>`).join('')}<\/ul><\/div>
+    <div class="sec"><div class="lbl">จุดเด่นแบรนด์<\/div><ul>${p.strengths.map(x => `<li>${esc(x[0])}${refs(p, x[1])}<\/li>`).join('')}<\/ul><\/div>
+    ${p.products.length ? `<div class="sec"><div class="lbl">สินค้าน่าสนใจอื่น<\/div><div class="plist">${p.products.map(x => `<div class="pi"><b>${esc(x[0])}<\/b><span>${esc(x[1])}${refs(p, x[2])}<\/span><\/div>`).join('')}<\/div><\/div>` : ''}
+    <div class="sec thai"><span class="lbl">ตลาดไทย<\/span> <span class="pill ${thaiCls}">${esc(LBL.importer[b.thaiImporter] || 'ยังไม่ตรวจ')}<\/span> <span class="tn">${esc(p.thaiNote[0])}${refs(p, p.thaiNote[1])}<\/span><\/div>
+    ${fdaLine(b)}
+    <div class="ana"><div class="lbl">บทวิเคราะห์และคำแนะนำ<\/div><p>${esc(p.analysis)}<\/p><div class="by">วิเคราะห์โดย Claude จากข้อมูลที่อ้างอิงด้านบน · ข้อมูล ณ ${esc(p.packDate || '')}<\/div><\/div>
+    <details class="srcs"${full ? ' open' : ''}><summary>แหล่งอ้างอิง ${p.sources.length} แห่ง<\/summary><ol>${p.sources.map(s => `<li><a href="${safeUrl(s[1])}" target="_blank" rel="noopener">${esc(s[0])}<\/a> ${lv(s[2])}<\/li>`).join('')}<\/ol><\/details>`;
+}
+function brandCard(b) {
+  const p = profOf(b), c = companyOf(b);
+  return `<article class="bcard">
+    <header class="bc-h"><button class="blink" data-report="${esc(b.id)}" aria-label="เปิดรายงาน ${esc(b.name)}">${logo(b, 56)}<\/button>
+      <div class="bc-t"><h3><button class="blink" data-report="${esc(b.id)}">${esc(b.name)}<\/button><\/h3>
+        <div class="bc-m">${cc(b.market)}<span>${esc(LBL.category[b.category] || '')}<\/span>${c ? `<span>· ${esc(c.name)}<\/span>` : ''}<\/div><\/div>
+      ${verdictPill(b)}<\/header>
+    ${p ? profileBody(b, p, false) : `<div class="empty">ยังไม่มีโปรไฟล์แบรนด์นี้ ${b.note ? '· ' + esc(b.note) : ''}<\/div>${fdaLine(b)}`}
+    <footer class="bc-f"><span class="pill st-${esc(b.status)}">${esc(LBL.status[b.status])}<\/span>
+      <span class="chips"><button class="btn sm" data-report="${esc(b.id)}">รายงานเต็ม<\/button><button class="btn ghost sm" data-editbrand="${esc(b.id)}">แก้ไข<\/button><\/span><\/footer>
+  <\/article>`;
+}
+
+// ---------- page: brand report ----------
+function companyOf(b) { return b && b.companyId ? S.data.companies.find(c => c.id === b.companyId) || null : null; }
+function domainOf(u) { try { return new URL(u).hostname; } catch (e) { return ''; } }
+function logo(b, size) {
+  const pr = profOf(b), site = pr && pr.logoFromSite === false ? '' : b.website;
+  const src = b.logoUrl || (site && domainOf(site) ? 'https://www.google.com/s2/favicons?sz=128&domain=' + encodeURIComponent(domainOf(site)) : '');
+  return `<span class="logo" style="--s:${size}px"><span>${esc((b.name || '?').trim().slice(0, 2).toUpperCase())}<\/span>${src ? `<img src="${safeUrl(src)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<\/span>`;
+}
+function latestFact(facts, metric) { return facts.filter(f => f.metric === metric).sort((a, b) => b.addedAt - a.addedAt)[0] || null; }
+function partnerScore(b) {
+  const c = companyOf(b), facts = c ? S.data.facts.filter(f => f.companyId === c.id) : [];
+  const ev = S.data.evidence.filter(e => e.brand && e.brand.toLowerCase() === b.name.toLowerCase());
+  const subj = [b.name.toLowerCase()].concat(c ? [c.name.toLowerCase()] : []);
+  const news = S.data.news.filter(n => subj.includes(n.subject.toLowerCase()));
+  const since = Date.now() - 180 * 864e5, flagged = news.filter(n => n.flags && n.publishedAt >= since);
+  const input = {
+    growth: (f => f && { v: f.value, show: (f.value > 0 ? '+' : '') + f.value + '% · ' + f.period, fact: f })(latestFact(facts, 'revenueGrowth')),
+    margin: (f => f && { v: f.value, show: f.value + '% · ' + f.period, fact: f })(latestFact(facts, 'opMargin')),
+    age: (f => f && { v: f.value, show: 'ก่อตั้ง ' + f.value + ' (' + (new Date().getFullYear() - f.value) + ' ปี)', fact: f })(latestFact(facts, 'founded')),
+    traction: ev.length ? { v: ev.reduce((s, e) => s + ({ A: 3, B: 2, C: 1 }[e.level] || 0), 0), show: ev.length + ' หลักฐาน' } : null,
+    news: news.length ? { v: flagged.length, show: flagged.length + ' จาก ' + news.filter(n => n.publishedAt >= since).length + ' ข่าว' } : null,
+  };
+  let got = 0, sum = 0; const lowLevel = [];
+  const rows = SCORE_RULES.map(r => {
+    const i = input[r.key]; if (!i) return { r, i: null };
+    const g = r.grade(i.v); got += r.w; sum += g * r.w;
+    if (i.fact && i.fact.level === 'C') lowLevel.push(r.label);
+    return { r, i, g };
+  });
+  const coverage = got, score = got ? Math.round(sum / got) : null;
+  const verdict = coverage < 60 ? ['ข้อมูลยังไม่พอสรุป', 'st-watch'] : score >= 75 ? ['น่าร่วมงาน', 'st-contacted'] : score >= 50 ? ['ควรศึกษาเพิ่มก่อนตัดสินใจ', 'st-shortlist'] : ['ความเสี่ยงสูง', 'st-rejected'];
+  return { c, facts, ev, news, flagged, rows, coverage, score, verdict, lowLevel };
+}
+function ring(score, coverage) {
+  const r = 46, C = 2 * Math.PI * r, p = score == null ? 0 : score / 100;
+  return `<svg viewBox="0 0 120 120" class="ring" aria-label="คะแนน ${score == null ? 'ไม่มี' : score}"><circle cx="60" cy="60" r="${r}" fill="none" stroke="#EFE8F2" stroke-width="10"/>
+    <circle cx="60" cy="60" r="${r}" fill="none" stroke="${coverage < 60 ? '#C9BCCD' : '#A47DAB'}" stroke-width="10" stroke-linecap="round" stroke-dasharray="${(C * p).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 60 60)"/>
+    <text x="60" y="62" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="28" font-weight="500" fill="#1F2340">${score == null ? '–' : score}<\/text>
+    <text x="60" y="82" text-anchor="middle" font-size="11" fill="#6B6F86">จาก 100<\/text><\/svg>`;
+}
+function pReport() {
+  const b = S.data.brands.find(x => x.id === S.brandId);
+  if (!b) return `<div class="empty">ไม่พบแบรนด์นี้ <button class="btn ghost sm" data-go="brands">กลับไป Watchlist<\/button><\/div>`;
+  const P = partnerScore(b), c = P.c;
+  const metricsOrder = ['revenueGrowth', 'opMargin', 'founded', 'revenue', 'other'];
+  const facts = P.facts.slice().sort((x, y) => metricsOrder.indexOf(x.metric) - metricsOrder.indexOf(y.metric) || y.addedAt - x.addedAt);
+  return `
+  <button class="btn ghost sm" data-go="brands" style="margin-bottom:14px">← Watchlist<\/button>
+  <section class="rep-head">
+    ${logo(b, 72)}
+    <div style="min-width:0;flex:1">
+      <h1>${esc(b.name)}<\/h1>
+      <div class="chips" style="margin-top:6px;align-items:center">${cc(b.market)}<span class="pill st-${esc(b.status)}">${esc(LBL.status[b.status])}<\/span><span class="tag">${esc(LBL.importer[b.thaiImporter])}<\/span><\/div>
+      <div class="links">
+        ${b.website ? `<a href="${safeUrl(b.website)}" target="_blank" rel="noopener">เว็บไซต์แบรนด์ ↗<\/a>` : '<span class="sub">ยังไม่มีเว็บไซต์แบรนด์<\/span>'}
+        ${c ? `<span>บริษัทแม่: <b>${esc(c.name)}<\/b>${c.listing ? ` <span class="tag">${esc(c.listing)}<\/span>` : ''}${c.website ? ` · <a href="${safeUrl(c.website)}" target="_blank" rel="noopener">เว็บไซต์บริษัทแม่ ↗<\/a>` : ''}<\/span>` : '<span class="sub">ยังไม่ระบุบริษัทแม่<\/span>'}
+      <\/div>
+    <\/div>
+    <div class="chips">${verdictPill(b)}<button class="btn ghost sm" id="fdaNow">ตรวจ อย. ตอนนี้<\/button><button class="btn ghost sm" data-editbrand="${esc(b.id)}">แก้ไขแบรนด์<\/button>${c ? `<button class="btn ghost sm" data-editco="${esc(c.id)}">แก้ไขบริษัทแม่<\/button>` : ''}<\/div>
+  <\/section>
+
+  ${profOf(b) ? `<section class="card bprof" style="margin-top:16px">${profileBody(b, profOf(b), true)}<\/section>` : `<section class="card" style="margin-top:16px">${fdaLine(b)}<\/section>`}
+
+  <div class="grid g-main" style="margin-top:16px">
+    <section class="card">
+      <div class="card-h"><h2>คะแนนความน่าเชื่อถือคู่ค้า<\/h2><span class="hint">คำนวณจากข้อมูลที่มีแหล่งอ้างอิงในระบบเท่านั้น<\/span><\/div>
+      <div class="score">
+        <div style="text-align:center">${ring(P.score, P.coverage)}<div><span class="pill ${P.verdict[1]}">${P.verdict[0]}<\/span><\/div>
+          <div class="sub" style="font-size:12px;margin-top:6px">ความครบของข้อมูล <b class="num">${P.coverage}%<\/b><\/div><\/div>
+        <div class="crit">${P.rows.map(({ r, i, g }) => `<div class="cr"><div class="cr-h"><span>${esc(r.label)} <span class="sub" style="font-size:11px">น้ำหนัก ${r.w}<\/span><\/span>
+            ${i ? `<span class="num">${g}<\/span>` : '<span class="tag">ไม่มีข้อมูล<\/span>'}<\/div>
+          <div class="bar"><i style="width:${i ? g : 0}%"><\/i><\/div>
+          <div class="sub" style="font-size:12px">${i ? esc(i.show) + (i.fact ? ` · <a href="${safeUrl(i.fact.url)}" target="_blank" rel="noopener">${esc(i.fact.sourceName)}<\/a> ${lv(i.fact.level)}` : '') : esc(r.rule)}<\/div><\/div>`).join('')}<\/div>
+      <\/div>
+      ${P.lowLevel.length ? `<p class="warn">ใช้ข้อมูลระดับ C ใน: ${esc(P.lowLevel.join(', '))} ควรตรวจซ้ำก่อนตัดสินใจ<\/p>` : ''}
+      <details class="rules"><summary>ดูเกณฑ์การให้คะแนน<\/summary><ul>${SCORE_RULES.map(r => `<li><b>${esc(r.label)}<\/b> (${r.w}%): ${esc(r.rule)}<\/li>`).join('')}
+        <li>คะแนนรวม = ค่าเฉลี่ยถ่วงน้ำหนักเฉพาะเกณฑ์ที่มีข้อมูล · ความครบต่ำกว่า 60% จะไม่สรุปผล · ≥75 น่าร่วมงาน · 50–74 ควรศึกษาเพิ่ม · ต่ำกว่า 50 ความเสี่ยงสูง<\/li><\/ul>
+        <p>ใช้ประกอบการคัดเลือกแบรนด์/คู่ค้าเพื่อนำเข้า ไม่ใช่คำแนะนำการลงทุนซื้อขายหุ้น<\/p><\/details>
+    <\/section>
+
+    <section class="card">
+      <div class="card-h"><h2>ข่าวล่าสุด<\/h2><button class="btn ghost sm" id="newsNow">ดึงข่าวตอนนี้<\/button><\/div>
+      ${P.news.length ? `<div class="rows">${P.news.slice(0, 10).map(n => `<div class="row"><div style="min-width:0">${newsTitle(n)}
+          <div class="s">${n.market === 'TH' ? cc('TH') + ' ' : ''}${esc(n.publisher)} · ${fmtDate(n.publishedAt)} · ${esc(n.subject)}<\/div><\/div>${n.flags ? `<span class="lv C" title="พบคำ: ${esc(n.flags)}">เตือน<\/span>` : ''}<\/div>`).join('')}<\/div>
+        <p class="sub" style="font-size:12px;margin-top:8px">จาก Google News (ตลาดต้นทาง + ไทย) เฉพาะข่าวที่มีชื่อแบรนด์ในหัวข่าว · หัวข่าวไทยแปลอัตโนมัติ · "เตือน" = หัวข่าวมีคำอย่าง recall, lawsuit, 리콜, 召回 ต้องเปิดอ่านเพื่อยืนยัน<\/p>`
+      : `<div class="empty">ยังไม่มีข่าว กด <b>"ดึงข่าวตอนนี้"<\/b> เพื่อค้นข่าวของ${esc(b.name)}${c ? 'และ' + esc(c.name) : ''}<\/div>`}
+    <\/section>
+  <\/div>
+
+  <section class="card" style="margin-top:16px">
+    <div class="card-h"><h2>วิดีโอรีวิวบน YouTube (90 วัน)<\/h2><span class="hint">${(() => { const v = (S.data.videos || []).filter(x => x.subject === b.name), th = v.filter(x => x.market === 'TH'); return v.length ? `ไทย ${th.length} คลิป ${fmtN(th.reduce((s, x) => s + x.views, 0))} วิว · ต่างประเทศ ${v.length - th.length} คลิป` : ''; })()}<\/span><\/div>
+    ${(() => {
+      const v = (S.data.videos || []).filter(x => x.subject === b.name).slice(0, 8);
+      if (!S.data.connectors.youtube) return '<div class="empty">ยังไม่ได้เปิด YouTube Data API (ดูขั้นตอนใน README)<\/div>';
+      if (!v.length) return `<div class="empty">ยังไม่พบคลิปที่มีชื่อ "${esc(b.name)}" ในชื่อคลิป ช่วง 90 วันล่าสุด<\/div>`;
+      return `<div class="rows">${v.map(x => `<div class="row"><div style="min-width:0">${newsTitle({ title: x.title, titleTh: x.titleTh, url: x.url })}
+        <div class="s">${cc(x.market)} ${esc(x.channel)} · ${fmtDate(x.publishedAt)}<\/div><\/div><span class="num" style="font-size:13px;white-space:nowrap">${fmtN(x.views)} วิว<\/span><\/div>`).join('')}<\/div>`;
+    })()}
+  <\/section>
+
+  <section class="card" style="margin-top:16px">
+    <div class="card-h"><h2>ผลประกอบการบริษัทแม่<\/h2>${c ? '<button class="btn sm" data-newfact>+ เพิ่มตัวเลข<\/button>' : ''}<\/div>
+    ${!c ? `<div class="empty"><b>ยังไม่ระบุบริษัทแม่<\/b> กด "แก้ไขแบรนด์" แล้วเลือกหรือเพิ่มบริษัทแม่ เพื่อบันทึกผลประกอบการ<\/div>`
+    : facts.length ? `<div class="tbl"><table><thead><tr><th>ตัวชี้วัด<\/th><th>ค่า<\/th><th>ช่วงเวลา<\/th><th>ระดับ<\/th><th>แหล่งที่มา<\/th><th><\/th><\/tr><\/thead><tbody>
+        ${facts.map(f => `<tr><td>${esc(LBL.metric[f.metric] || f.metric)}${f.note ? `<div class="sub" style="font-size:11px">${esc(f.note)}<\/div>` : ''}<\/td>
+          <td class="num ${f.metric === 'revenueGrowth' || f.metric === 'opMargin' ? (f.value >= 0 ? 'up' : 'down') : ''}">${f.metric === 'founded' ? f.value : (f.metric === 'revenueGrowth' && f.value > 0 ? '+' : '') + fmtN(f.value) + (f.metric === 'revenueGrowth' || f.metric === 'opMargin' ? '%' : '')}<\/td>
+          <td>${esc(f.period)}<\/td><td>${lv(f.level)}<\/td><td><a href="${safeUrl(f.url)}" target="_blank" rel="noopener">${esc(f.sourceName)}<\/a><div class="sub" style="font-size:11px">${esc(f.addedBy)}<\/div><\/td>
+          <td>${S.user.role === 'admin' || f.addedBy === S.user.username ? `<button class="btn danger sm" data-delfact="${esc(f.id)}">ลบ<\/button>` : ''}<\/td><\/tr>`).join('')}<\/tbody><\/table><\/div>`
+    : `<div class="empty">ยังไม่มีตัวเลข เพิ่มจากงบการเงิน รายงานประจำปี หรือระบบเปิดเผยข้อมูล เช่น DART (เกาหลี), EDINET (ญี่ปุ่น), ตลาดหลักทรัพย์เซี่ยงไฮ้/เซินเจิ้น พร้อมลิงก์<\/div>`}
+  <\/section>
+
+  <section class="card" style="margin-top:16px">
+    <div class="card-h"><h2>หลักฐานเทรนด์ของแบรนด์นี้<\/h2><span class="hint">${P.ev.length} รายการ<\/span><\/div>
+    ${P.ev.length ? `<div>${sortSignals(P.ev).map(sigHtml).join('')}<\/div>` : `<div class="empty">ยังไม่มีหลักฐานที่ระบุแบรนด์ "${esc(b.name)}" เพิ่มได้ที่หน้าหลักฐาน (สะกดชื่อแบรนด์ให้ตรงกัน)<\/div>`}
+  <\/section>`;
+}
+function companyForm(c, onSaved, onCancel) {
+  c = c || { country: 'KR' };
+  openModal(`<h2>${c.id ? 'แก้ไขบริษัทแม่' : 'เพิ่มบริษัทแม่'}<\/h2><div class="form">
+    <label class="f full">ชื่อบริษัท <span class="req">*<\/span><input type="text" id="c_name" value="${esc(c.name)}" placeholder="เช่น Amorepacific Corporation"><\/label>
+    <label class="f">ประเทศ<select id="c_country">${opt(LBL.market, c.country, 'ไม่ระบุ')}<\/select><\/label>
+    <label class="f">ตลาดหลักทรัพย์ / รหัสหุ้น<input type="text" id="c_listing" value="${esc(c.listing)}" placeholder="เช่น KRX 090430 หรือ ไม่จดทะเบียน"><\/label>
+    <label class="f full">เว็บไซต์บริษัทแม่<input type="url" id="c_web" value="${esc(c.website)}" placeholder="https://"><\/label>
+    <label class="f full">หมายเหตุ<input type="text" id="c_note" value="${esc(c.note)}"><\/label><\/div>
+    <p class="sub" style="font-size:12px">ปีที่ก่อตั้งและตัวเลขผลประกอบการ ให้เพิ่มในหน้ารายงานแบรนด์พร้อมลิงก์แหล่งที่มา<\/p>
+    <p class="err" id="cerr"><\/p><div class="modal-actions"><button class="btn ghost" id="ccancel">ยกเลิก<\/button><button class="btn" id="csave">บันทึก<\/button><\/div>`);
+  document.getElementById('ccancel').onclick = () => onCancel ? onCancel() : closeModal();
+  document.getElementById('csave').onclick = async ev => {
+    busy(ev.target, true);
+    const v = id => document.getElementById(id).value;
+    try {
+      const saved = await call('saveCompany', S.token, { id: c.id || '', name: v('c_name'), country: v('c_country'), listing: v('c_listing'), website: v('c_web'), note: v('c_note') });
+      const i = S.data.companies.findIndex(x => x.id === saved.id); if (i >= 0) S.data.companies[i] = saved; else S.data.companies.push(saved);
+      toast('บันทึกบริษัทแล้ว');
+      if (onSaved) onSaved(saved.id); else { closeModal(); await refresh(); }
+    } catch (err) { document.getElementById('cerr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+function factForm(c) {
+  openModal(`<h2>เพิ่มตัวเลขของ ${esc(c.name)}<\/h2><div class="form">
+    <label class="f">ตัวชี้วัด<select id="f_metric">${opt(LBL.metric, 'revenueGrowth')}<\/select><\/label>
+    <label class="f">ค่า (ตัวเลขเท่านั้น) <span class="req">*<\/span><input type="text" id="f_value" inputmode="decimal" placeholder="เช่น -7.19 หรือ 2003"><\/label>
+    <label class="f">ช่วงเวลา <span class="req">*<\/span><input type="text" id="f_period" placeholder="เช่น FY2025, H1 2026"><\/label>
+    <label class="f">ระดับความน่าเชื่อถือ<select id="f_level">${opt(LBL.level, 'A')}<\/select><\/label>
+    <label class="f">ชื่อแหล่งที่มา <span class="req">*<\/span><input type="text" id="f_src" placeholder="เช่น DART, รายงานประจำปี 2025"><\/label>
+    <label class="f">ลิงก์แหล่งที่มา <span class="req">*<\/span><input type="url" id="f_url" placeholder="https://"><\/label>
+    <label class="f full">หมายเหตุ<input type="text" id="f_note" placeholder="เช่น ตัวเลขทั้งกลุ่มบริษัท / เฉพาะแบรนด์, หน่วยเงิน"><\/label><\/div>
+    <p class="sub" style="font-size:12px">${esc(LEVEL_HELP)}<\/p>
+    <p class="err" id="ferr"><\/p><div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="fsave">บันทึก<\/button><\/div>`);
+  document.getElementById('fsave').onclick = async ev => {
+    busy(ev.target, true);
+    const v = id => document.getElementById(id).value;
+    try { await call('saveFact', S.token, { companyId: c.id, metric: v('f_metric'), value: v('f_value').replace(/,/g, ''), period: v('f_period'), level: v('f_level'), sourceName: v('f_src'), url: v('f_url'), note: v('f_note') });
+      closeModal(); toast('บันทึกแล้ว'); await refresh(); }
+    catch (err) { document.getElementById('ferr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+
+// ---------- page: sources ----------
+function pSources() {
+  const d = S.data, isAdmin = S.user.role === 'admin';
+  const acc = {}; d.ig.accounts.forEach(a => acc[a.username] = a);
+  const groups = ['Instagram', 'Web', 'API', 'Report'].map(p => [p, d.sources.filter(s => s.platform === p)]).filter(g => g[1].length);
+  const conn = (on, name) => `<span class="pill ${on ? 'st-contacted' : 'st-watch'}">${name}: ${on ? 'เชื่อมแล้ว' : 'ยังไม่เชื่อม'}<\/span>`;
+  return `
+  <div class="top"><div><h1>แหล่งข้อมูล<\/h1><p class="sub">บัญชีและเว็บไซต์ที่ใช้ติดตามเทรนด์ และสถานะการดึงข้อมูลอัตโนมัติ<\/p><\/div>
+    ${isAdmin ? '<div class="chips"><button class="btn ghost" data-newsrc>+ เพิ่มแหล่งข้อมูล<\/button><button class="btn" id="fetchNow">ดึงข้อมูลตอนนี้<\/button><\/div>' : ''}<\/div>
+  <div class="card" style="margin-bottom:16px"><div class="card-h"><h2>การเชื่อมต่อ<\/h2><div class="chips"><span class="pill st-contacted">อัปเดตอัตโนมัติทุก ${d.auto ? d.auto.hours : 6} ชม.<\/span><span class="pill st-contacted">Google News: เชื่อมแล้ว<\/span><span class="pill st-contacted">แปลหัวข่าวเป็นไทย: เปิดอยู่<\/span><span class="pill st-contacted">Wikidata (ปีก่อตั้ง): เชื่อมแล้ว<\/span>${conn(d.connectors.youtube, 'YouTube')} ${conn(d.connectors.naver, 'Naver DataLab')} ${conn(d.connectors.instagram, 'Instagram Graph API')}<\/div><\/div>
+    ${d.connectors.logs.length ? `<div class="rows">${d.connectors.logs.slice(0, 6).map(l => `<div class="row"><div><b style="font-size:13px">${esc(l.job)}<\/b> <span class="s">${fmtDate(l.time)} ${new Date(l.time).toLocaleTimeString('th-TH', { hour: '2-digit', minute: '2-digit' })}<\/span><div class="s" style="word-break:break-word">${esc(l.message)}<\/div><\/div><span class="lv ${l.ok ? 'A' : 'C'}">${l.ok ? 'สำเร็จ' : 'ผิดพลาด'}<\/span><\/div>`).join('')}<\/div>` : '<div class="empty">ยังไม่เคยดึงข้อมูล<\/div>'}<\/div>
+  <div class="grid g-2">
+    ${groups.map(([p, list]) => `<section class="card"><div class="card-h"><h2>${esc(LBL.platform[p])}<\/h2><span class="hint">${list.length} แหล่ง<\/span><\/div><div class="rows">
+      ${list.map(s => { const a = acc[s.handle]; return `<div class="row"><div><b style="font-size:14px"><a href="${safeUrl(s.url)}" target="_blank" rel="noopener">${esc(s.name)}<\/a><\/b> ${cc(s.market)}${s.active ? '' : ' <span class="tag">ปิดอยู่<\/span>'}
+        <div class="s">${a ? `ผู้ติดตาม <span class="num">${fmtN(a.followers)}<\/span> · ${fmtN(a.mediaCount)} โพสต์ · อัปเดต ${fmtDate(a.at)}` : esc(s.note || (p === 'Instagram' ? 'ยังไม่มีข้อมูลจาก API' : ''))}<\/div><\/div>
+        ${isAdmin ? `<button class="btn ghost sm" data-editsrc="${esc(s.id)}">แก้ไข<\/button>` : ''}<\/div>`; }).join('')}<\/div><\/section>`).join('')}
+    <section class="card"><div class="card-h"><h2>คำค้น Naver DataLab<\/h2>${isAdmin ? '<button class="btn ghost sm" data-newkw>+ เพิ่มคำค้น<\/button>' : ''}<\/div>
+      <div class="rows">${d.keywords.map(k => `<div class="row"><div><b style="font-size:14px">${esc(k.label)}<\/b>${k.active ? '' : ' <span class="tag">ปิดอยู่<\/span>'}<div class="s">${esc(k.keyword)}<\/div><\/div>
+        ${isAdmin ? `<button class="btn ghost sm" data-togglekw="${esc(k.keyword)}">${k.active ? 'ปิด' : 'เปิด'}<\/button>` : ''}<\/div>`).join('') || '<div class="empty">ยังไม่มีคำค้น<\/div>'}<\/div>
+      <p class="sub" style="font-size:12px;margin-top:8px">ใช้คำภาษาเกาหลี คั่นคำพ้องด้วย , เช่น PDRN,피디알엔<\/p><\/section>
+  <\/div>`;
+}
+function srcForm(s) {
+  s = s || { platform: 'Instagram', market: 'KR', active: true };
+  openModal(`<h2>${s.id ? 'แก้ไขแหล่งข้อมูล' : 'เพิ่มแหล่งข้อมูล'}<\/h2>
+  <div class="form">
+    <label class="f">แพลตฟอร์ม<select id="s_pf">${opt(LBL.platform, s.platform)}<\/select><\/label>
+    <label class="f">ตลาด<select id="s_mk">${opt(LBL.market, s.market, 'ไม่ระบุ')}<\/select><\/label>
+    <label class="f">ชื่อบัญชี IG (ไม่ต้องใส่ @)<input type="text" id="s_handle" value="${esc(s.handle)}" placeholder="oliveyoung_official" autocapitalize="none"><\/label>
+    <label class="f">ชื่อที่แสดง<input type="text" id="s_name" value="${esc(s.name)}"><\/label>
+    <label class="f full">ลิงก์ (สำหรับเว็บไซต์/รายงาน)<input type="url" id="s_url" value="${esc(s.platform === 'Instagram' ? '' : s.url)}" placeholder="https://"><\/label>
+    <label class="f full">หมายเหตุ<input type="text" id="s_note" value="${esc(s.note)}"><\/label>
+    <label class="f" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="s_active"${s.active ? ' checked' : ''}> ใช้งาน<\/label>
+  <\/div>
+  <p class="err" id="serr"><\/p>
+  <div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="ssave">บันทึก<\/button><\/div>`);
+  const v = id => document.getElementById(id).value;
+  document.getElementById('ssave').onclick = async ev => {
+    busy(ev.target, true);
+    try { await call('saveSource', S.token, { id: s.id || '', platform: v('s_pf'), market: v('s_mk'), handle: v('s_handle'), name: v('s_name'), url: v('s_url'), note: v('s_note'), active: document.getElementById('s_active').checked }); closeModal(); toast('บันทึกแล้ว'); await refresh(); }
+    catch (err) { document.getElementById('serr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+function kwForm() {
+  openModal(`<h2>เพิ่มคำค้น Naver<\/h2><div class="form">
+    <label class="f full">คำค้น (ภาษาเกาหลี คั่นคำพ้องด้วย ,) <span class="req">*<\/span><input type="text" id="k_kw" placeholder="เช่น 콜라겐,콜라겐 크림"><\/label>
+    <label class="f full">ชื่อที่แสดง<input type="text" id="k_label" placeholder="เช่น Collagen"><\/label><\/div>
+    <p class="err" id="kerr"><\/p><div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="ksave">บันทึก<\/button><\/div>`);
+  document.getElementById('ksave').onclick = async ev => {
+    busy(ev.target, true);
+    try { await call('saveKeyword', S.token, { keyword: document.getElementById('k_kw').value, label: document.getElementById('k_label').value, active: true }); closeModal(); toast('บันทึกแล้ว'); await refresh(); }
+    catch (err) { document.getElementById('kerr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+
+// ---------- page: users (admin) ----------
+function pUsers() {
+  if (!S.users) { call('listUsers', S.token).then(u => { S.users = u; if (S.page === 'users') renderPage(); }).catch(e => toast(e.message)); return '<div class="loading">กำลังโหลดรายชื่อผู้ใช้…<\/div>'; }
+  return `
+  <button class="btn ghost sm" data-go="radar" style="margin-bottom:14px">← กลับ<\/button>
+  <div class="top"><div><h1>จัดการผู้ใช้<\/h1><p class="sub">สร้างบัญชีให้ทีม แล้วส่งชื่อผู้ใช้และรหัสผ่านเริ่มต้นให้เจ้าของบัญชีไปเปลี่ยนเอง<\/p><\/div><button class="btn" data-newuser>+ สร้างบัญชี<\/button><\/div>
+  <div class="tbl"><table><thead><tr><th>ผู้ใช้<\/th><th>สิทธิ์<\/th><th>สถานะ<\/th><th>เข้าระบบล่าสุด<\/th><th><\/th><\/tr><\/thead><tbody>
+    ${S.users.map(u => `<tr><td><div class="t">${esc(u.name)}<\/div><div class="sub" style="font-size:12px">@${esc(u.username)}<\/div><\/td>
+      <td><span class="pill ${u.role === 'admin' ? 'st-shortlist' : 'st-watch'}">${u.role === 'admin' ? 'ผู้ดูแลระบบ' : 'ผู้ใช้'}<\/span><\/td>
+      <td>${u.active ? '<span class="pill st-contacted">ใช้งาน<\/span>' : '<span class="pill st-rejected">ปิดบัญชี<\/span>'}<\/td><td class="num">${fmtDate(u.lastLogin)}<\/td>
+      <td style="white-space:nowrap"><button class="btn ghost sm" data-resetpw="${esc(u.username)}">ตั้งรหัสใหม่<\/button> ${u.username !== S.user.username ? `<button class="btn ${u.active ? 'danger' : 'ghost'} sm" data-toggleuser="${esc(u.username)}" data-active="${u.active ? 1 : 0}">${u.active ? 'ปิดบัญชี' : 'เปิดบัญชี'}<\/button>` : ''}<\/td><\/tr>`).join('')}
+  <\/tbody><\/table><\/div>`;
+}
+function userForm() {
+  openModal(`<h2>สร้างบัญชีผู้ใช้<\/h2><form class="form" id="uf" onsubmit="return false">
+    <label class="f">ชื่อผู้ใช้ (a-z 0-9 . _ -) <span class="req">*<\/span><input type="text" id="u_user" autocapitalize="none" autocomplete="off"><\/label>
+    <label class="f">ชื่อที่แสดง <span class="req">*<\/span><input type="text" id="u_name"><\/label>
+    <label class="f">สิทธิ์<select id="u_role"><option value="user">ผู้ใช้<\/option><option value="admin">ผู้ดูแลระบบ<\/option><\/select><\/label>
+    <label class="f">รหัสผ่านเริ่มต้น <span class="req">*<\/span><input type="password" id="u_pw" autocomplete="new-password" placeholder="อย่างน้อย 8 ตัว มีตัวอักษรและตัวเลข"><\/label><\/form>
+    <p class="err" id="uerr"><\/p><div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="usave">สร้างบัญชี<\/button><\/div>`);
+  document.getElementById('usave').onclick = async ev => {
+    busy(ev.target, true);
+    try { await call('createUser', S.token, { username: document.getElementById('u_user').value, name: document.getElementById('u_name').value, role: document.getElementById('u_role').value, password: document.getElementById('u_pw').value });
+      closeModal(); toast('สร้างบัญชีแล้ว'); S.users = null; renderPage(); }
+    catch (err) { document.getElementById('uerr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+function resetPwForm(username) {
+  openModal(`<h2>ตั้งรหัสผ่านใหม่ให้ @${esc(username)}<\/h2><form class="form" onsubmit="return false"><label class="f full">รหัสผ่านใหม่<input type="password" id="r_pw" autocomplete="new-password" placeholder="อย่างน้อย 8 ตัว มีตัวอักษรและตัวเลข"><\/label><\/form>
+    <p class="err" id="rerr"><\/p><div class="modal-actions"><button class="btn ghost" data-close>ยกเลิก<\/button><button class="btn" id="rsave">บันทึก<\/button><\/div>`);
+  document.getElementById('rsave').onclick = async ev => {
+    busy(ev.target, true);
+    try { await call('resetUserPassword', S.token, username, document.getElementById('r_pw').value); closeModal(); toast('ตั้งรหัสผ่านใหม่แล้ว'); }
+    catch (err) { document.getElementById('rerr').textContent = err.message; busy(ev.target, false); }
+  };
+}
+
+// ---------- events ----------
+function bindPage() {
+  const $ = s => document.querySelector(s), $$ = s => document.querySelectorAll(s);
+  $$('[data-go]').forEach(b => b.onclick = () => go(b.dataset.go));
+  $$('[data-fk]').forEach(b => b.onclick = () => { S.f[b.dataset.fk] = b.dataset.fv; renderPage(); });
+  $$('[data-addbrand]').forEach(b => b.onclick = () => {
+    const name = b.dataset.addbrand, e = S.data.evidence.find(x => x.brand.toLowerCase() === name.toLowerCase());
+    brandForm({ name, market: e ? e.market : 'KR', category: e && e.category !== 'both' ? e.category : 'skincare', status: 'watch', thaiImporter: 'unknown' });
+  });
+  if (S.page === 'evidence') {
+    const upd = () => { S.ef = { q: $('#evq').value, market: $('#evm').value, category: $('#evc').value, level: $('#evl').value, kind: $('#evk').value }; const pos = $('#evq').selectionStart; renderPage(); const q = $('#evq'); q.focus(); try { q.setSelectionRange(pos, pos); } catch (e) {} };
+    $('#evq').oninput = upd; ['#evm', '#evc', '#evl', '#evk'].forEach(s => $(s).onchange = upd);
+    $('[data-newev]').onclick = () => evForm();
+    $$('[data-editev]').forEach(b => b.onclick = () => evForm(S.data.evidence.find(e => e.id === b.dataset.editev)));
+  }
+  $$('[data-report]').forEach(b => b.onclick = () => go('report', b.dataset.report));
+  $$('[data-editbrand]').forEach(b => b.onclick = () => brandForm(S.data.brands.find(x => x.id === b.dataset.editbrand)));
+  if (S.page === 'brands') {
+    $('[data-newbrand]').onclick = () => brandForm();
+    $$('[data-bk]').forEach(b => b.onclick = () => { S.bf[b.dataset.bk] = b.dataset.fv; renderPage(); });
+    $('#bq').oninput = () => { const pos = $('#bq').selectionStart; S.bf.q = $('#bq').value; renderPage(); const q = $('#bq'); q.focus(); try { q.setSelectionRange(pos, pos); } catch (e) {} };
+    const ip = $('#importPack');
+    if (ip) ip.onclick = async () => {
+      busy(ip, true); ip.textContent = 'กำลังนำเข้า…';
+      try { const r = await call('importBrandPack', S.token); toast('นำเข้าแล้ว: แบรนด์ใหม่ ' + r.brandsNew + ', อัปเดต ' + r.brandsUpd + ', โปรไฟล์ ' + r.profiles); await refresh(); }
+      catch (e) { toast(e.message); busy(ip, false); ip.textContent = 'นำเข้าข้อมูลแบรนด์อีกครั้ง'; }
+    };
+  }
+  if (S.page === 'report') {
+    const br = S.data.brands.find(x => x.id === S.brandId), co = companyOf(br);
+    $$('[data-editco]').forEach(b => b.onclick = () => companyForm(co));
+    const nf = $('[data-newfact]'); if (nf) nf.onclick = () => factForm(co);
+    $$('[data-delfact]').forEach(b => b.onclick = async () => {
+      if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'ยืนยันลบ'; return; }
+      busy(b, true);
+      try { await call('deleteFact', S.token, b.dataset.delfact); toast('ลบแล้ว'); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
+    });
+    const fd = $('#fdaNow');
+    if (fd) fd.onclick = async () => { busy(fd, true); fd.textContent = 'กำลังตรวจ อย.…'; try { toast(await call('checkThaiFda', S.token, br.id)); await refresh(); } catch (e) { toast(e.message); busy(fd, false); fd.textContent = 'ตรวจ อย. ตอนนี้'; } };
+    const nn = $('#newsNow');
+    if (nn) nn.onclick = async () => { busy(nn, true); nn.textContent = 'กำลังค้นข่าว…'; try { toast(await call('fetchNewsForBrand', S.token, br.id)); await refresh(); } catch (e) { toast(e.message); busy(nn, false); nn.textContent = 'ดึงข่าวตอนนี้'; } };
+  }
+  if (S.page === 'sources') {
+    const n = $('[data-newsrc]'); if (n) n.onclick = () => srcForm();
+    const k = $('[data-newkw]'); if (k) k.onclick = () => kwForm();
+    $$('[data-editsrc]').forEach(b => b.onclick = () => srcForm(S.data.sources.find(x => x.id === b.dataset.editsrc)));
+    $$('[data-togglekw]').forEach(b => b.onclick = async () => {
+      const kw = S.data.keywords.find(x => x.keyword === b.dataset.togglekw); busy(b, true);
+      try { await call('saveKeyword', S.token, { keyword: kw.keyword, label: kw.label, active: !kw.active }); await refresh(); } catch (e) { toast(e.message); busy(b, false); }
+    });
+    const f = $('#fetchNow');
+    if (f) f.onclick = async () => { busy(f, true); f.textContent = 'กำลังดึงข้อมูล…'; try { await call('runFetchNow', S.token); toast('ดึงข้อมูลเสร็จแล้ว'); await refresh(); } catch (e) { toast(e.message); busy(f, false); f.textContent = 'ดึงข้อมูลตอนนี้'; } };
+  }
+  if (S.page === 'users' && S.users) {
+    $('[data-newuser]').onclick = () => userForm();
+    $$('[data-resetpw]').forEach(b => b.onclick = () => resetPwForm(b.dataset.resetpw));
+    $$('[data-toggleuser]').forEach(b => b.onclick = async () => {
+      const on = b.dataset.active === '1';
+      if (on && b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'ยืนยันปิดบัญชี'; return; }
+      busy(b, true);
+      try { await call('setUserActive', S.token, b.dataset.toggleuser, !on); S.users = null; toast(on ? 'ปิดบัญชีแล้ว' : 'เปิดบัญชีแล้ว'); renderPage(); } catch (e) { toast(e.message); busy(b, false); }
+    });
+  }
+}
+function openModal(html) {
+  const m = document.getElementById('modal'); document.getElementById('modalCard').innerHTML = html; m.hidden = false;
+  m.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
+  const first = m.querySelector('input,select,textarea'); if (first) first.focus();
+}
+function closeModal() { document.getElementById('modal').hidden = true; }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ---------- start ----------
+window.__brStarted = true;
+S.token = load('br_token');
+if (S.token) boot(); else renderLogin();
+</script>
+</body>
+</html>
